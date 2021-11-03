@@ -1,0 +1,4 @@
+"C:\Program Files\JetBrains\CLion 2021.2.1\bin\cmake\win\bin\cmake.exe" -DCMAKE_BUILD_TYPE=Debug -DCMAKE_DEPENDS_USE_COMPILER=FALSE -G "CodeBlocks - MinGW Makefiles" C:\V2CSPE1\LaserGannou
+-- Configuring done
+-- Generating done
+-- Build files have been written to: C:/V2CSPE1/LaserGannou/cmake-build-debug
