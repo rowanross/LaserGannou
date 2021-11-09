@@ -21,8 +21,9 @@ private:
     int gameState = 0;
 
     static constexpr const int PRE_GAME = 0;
-    static constexpr const int GAME_SETUP = 1;
-    static constexpr const int GAME = 2;
+    static constexpr const int SETTIMING = 1;
+    static constexpr const int SETWEAPONPOWER = 2;
+    static constexpr const int GAME = 3;
     auto oled;
 
     void main() {
@@ -52,18 +53,37 @@ private:
                    << "press \n any \n button";
                 if(buttonPressedChannel.read() != 0){
                     showChange();
-                    gameState = GAME_SETUP;
+                    gameState = SETTIMING;
                 }
 
-            case GAME_SETUP:
+            case SETTIMING:
                 // Momenteel enkel voor het 'opgeven' van de tijd in de int time. Deze zal in gameParameter verder moeten worden verwerkt;
+
+                auto w4 = hwlib::part(
+                        oled,
+                        hwlib::xy( 0, 0 ),
+                        hwlib::xy( 128, 16));
+                auto w5 = hwlib::part(
+                        oled,
+                        hwlib::xy( 0, 16 ),
+                        hwlib::xy( 128, 32));
+                auto w6 = hwlib::part(
+                        oled,
+                        hwlib::xy( 0, 32 ),
+                        hwlib::xy( 128, 48));
+
+                auto f3 = hwlib::font_default_8x8();
+                auto d4 = hwlib::terminal_from( w4, f1 );
+                auto d5 = hwlib::terminal_from( w5, f1 );
+                auto d6 = hwlib::terminal_from( w6, f1 );
+
                 int time = 5;
-                d1 << "\f"
-                   << "choose \n timing:";
-                d2 << "\f"
-                   << "==============\n"
-                   << time << "min" "\n"
-                   << "==============\n";
+                d4 << "\f"
+                   << "    Geef uw \n  timing:";
+                d5 << "\f"
+                   << "minuten";
+                d6 << "\f"
+                   << "     -  " << time << "  +";
                 if (buttonPressedChannel.read() == 1) {
                     time++;
                     showChange();
@@ -77,18 +97,50 @@ private:
                        << "u sure?";
                     d2 << "\f";
                     if (buttonPressedChannel.read() = 4) {
-                        gameState = GAME;
+                        gameState = SETWEAPONPOWER;
                     }else if (buttonPressedChannel.read() = 3){
-                        gameState = GAME_SETUP;
+                        gameState = SETTIMING;
                     }
                 }
+
+
+            case SETWEAPONPOWER:
+                int power = 1;
+                d4 << "\f"
+                   << "    Geef uw \n  weaponpower:";
+                d5 << "\f"
+                   << "" << hwlib::flush;
+                d6 << "\f"
+                   << "     -  " << power << "  +";
+
+                if (buttonPressedChannel.read() == 1) {
+                    power++;
+                    showChange();
+                }
+                if (buttonPressedChannel.read() == 2) {
+                    power++;
+                    showChange();
+                }
+                 if (buttonPressedChannel.read() = 4){
+                    d1 << "\f"
+                       << "u sure?";
+                    d2 << "\f";
+                    if (buttonPressedChannel.read() = 4) {
+                        gameState = GAME;
+                    }else if (buttonPressedChannel.read() = 3){
+                        gameState = SETWEAPONPOWER;
+                    }
+
+                break;
+
             case GAME:
 
                 // show time
                 // show playerNr
                 break;
-        }
+            }
 
+        }
     }
 
 
