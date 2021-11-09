@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<CodeLite_Project Name="03-01-undeclared" InternalType="">
+<CodeLite_Project Name="02-01-blink" InternalType="">
   <Plugins>
     <Plugin Name="qmake">
       <![CDATA[00020001N0005Debug0000000000000001N0007Release000000000000]]>
@@ -30,6 +30,7 @@
   <Dependencies/>
   <VirtualDirectory Name="source">
     <File Name="main.cpp"/>
+    <File Name="bmptk_fixed_size_stack.c"/>
     <File Name="makefile"/>
   </VirtualDirectory>
   <Settings Type="Dynamic Library">

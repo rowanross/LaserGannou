@@ -9,15 +9,14 @@
 #############################################################################
 
 # source files in this project (main.cpp is automatically assumed)
-SOURCES := 
+SOURCES :=
 
 # header files in this project
-HEADERS := 
+HEADERS := runGameControl.h initGameControl.h gameParametersControl.h
 
 # other places to look for files for this project
 SEARCH  := 
 
-# set REATIVE to the next higher directory 
-# and defer to the Makefile.due there
+# set RELATIVE to the next higher directory and defer to the Makefile.due
 RELATIVE := $(RELATIVE)../
 include $(RELATIVE)Makefile.due
