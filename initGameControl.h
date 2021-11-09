@@ -4,6 +4,7 @@
 #include "hwlib.hpp"
 #include "rtos.hpp"
 //#include "display"
+#include "sendIRMessageControl.h"
 
 
 #ifndef V2THDE_EXAMPLES_INITGAMECONTROL_H
@@ -16,7 +17,9 @@ private:
     static constexpr int KIESTIMING = 2;
     static constexpr int SENDSTARTSIGNAL= 3;
 
-    rtos::channel<int, 5> buttonPressedChannel;
+    sendIRMessageControl & sendIRMessage;
+
+    rtos::channel<buttonID, 5> buttonPressedChannel;
 
     void main(){
         namespace target = hwlib::target;
@@ -45,20 +48,21 @@ private:
                     status = SENDSTARTSIGNAL;
                 }
             case SENDSTARTSIGNAL:
-                irLedControl.sendStartSignal();
+                sendIRMessage.sendStartSignal(); //stuur start signaal;
                 // stuur timer en start zelf timer
         }
 
     }
 
 public:
-    initGameControl() : rtos::task<>("initGameControlTaak") {};
+    initGameControl(sendIRMessageControl & sendIRMessage) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage){
+
+    };
+
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
 
     }
-
-
 };
 
 
