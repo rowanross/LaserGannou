@@ -1,8 +1,8 @@
 #include "hwlib.hpp"
 #include "rtos.hpp"
 #include "runGameControl.h"
-#include "initGameControl.h"
-
+//#include "initGameControl.h"
+#include "receiveIRMessageControl.h"
 
 int main( void ){
     // wait for the PC console to start
@@ -10,9 +10,13 @@ int main( void ){
 
     namespace target = hwlib::target;
 
-    initGameControl initGame;
+    receiveIRMessageControl receive;
+    for(;;){
+        hwlib::cout << receive.receiveMessage() << hwlib::endl;
+    }
 
-    initGame.startGame();
+//    initGameControl initGame;
+//    initGame.startGame();
 
 //
 //    for(;;){

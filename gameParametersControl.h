@@ -1,6 +1,7 @@
 #ifndef V2THDE_EXAMPLES_GAMEPARAMETERSCONTROL_H
 #define V2THDE_EXAMPLES_GAMEPARAMETERSCONTROL_H
 
+#include "hwlib.hpp"
 
 class gameParametersControl {
 private:
