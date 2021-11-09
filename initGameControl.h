@@ -1,66 +1,67 @@
-#ifndef V2THDE_EXAMPLES_INITGAMECONTROL_H
-#define V2THDE_EXAMPLES_INITGAMECONTROL_H
+//
+// Created by eriks on 8-11-2021.
+//
 #include "hwlib.hpp"
 #include "rtos.hpp"
-#include "gameParametersControl.h"
+//#include "display"
+#include "sendIRMessageControl.h"
 
-class initGameControl {
+
+#ifndef V2THDE_EXAMPLES_INITGAMECONTROL_H
+#define V2THDE_EXAMPLES_INITGAMECONTROL_H
+
+
+class initGameControl : public rtos::task<> {
 private:
-    hwlib::target::pin_in min = hwlib::target::pin_in(hwlib::target::pins::d8);
-    hwlib::target::pin_in plus = hwlib::target::pin_in(hwlib::target::pins::d9);
-    hwlib::target::pin_in confirm = hwlib::target::pin_in(hwlib::target::pins::d10);
-public:
-    initGameControl(
-            hwlib::target::pin_in min = hwlib::target::pin_in(hwlib::target::pins::d8),
-            hwlib::target::pin_in plus = hwlib::target::pin_in(hwlib::target::pins::d9),
-            hwlib::target::pin_in confirm = hwlib::target::pin_in(hwlib::target::pins::d10))
-    {}
+    static constexpr int SYSTEMSTARTUP = 1;
+    static constexpr int KIESTIMING = 2;
+    static constexpr int SENDSTARTSIGNAL= 3;
 
-    int startGame(){
-        int playtime = getPlaytime();
-        //if(playerNumber != 1){
-        //  sendIR........
-        //else{
-        gameParametersControl parameters;
-        int weaponPower = parameters.setWeaponpower();
-    }
+    sendIRMessageControl & sendIRMessage;
 
-    int getPlaytime(){
-        int playtime = 5;
-        scherm(playtime);
-        for (;;){
-            if(min.read() == 0){
-                if(playtime > 1){
-                    playtime--;
+    rtos::channel<buttonID, 5> buttonPressedChannel;
+
+    void main(){
+        namespace target = hwlib::target;
+        int status = SYSTEMSTARTUP;
+
+        switch (status){
+            case SYSTEMSTARTUP:
+                display.showChange();
+                auto evt = wait(buttonPressedChannel);
+                if(evt == buttonPressedChannel){
+                    if (buttonPressedChannel.read() != 0) {
+                        status = KIESTIMING;
+                    }
                 }
-                scherm(playtime);
-            }
-            if(plus.read() == 0){
-                playtime++;
-                scherm(playtime);
-            }
-            if(confirm.read() == 0){
-                break;
-            }
+            case KIESTIMING:
+                display.showChange();
+                timer = 5; // zet timer op 5 min standaard;
+                if(buttonPressedChannel.read() == 1){
+                    timer+= 1;
+                    display.showChange();
+                }else if(buttonPressedChannel.read() == 2){
+                    display.showChange();
+                    timer-= 1;
+                }
+                if(buttonPressedChannel.read() == 4){
+                    status = SENDSTARTSIGNAL;
+                }
+            case SENDSTARTSIGNAL:
+                sendIRMessage.sendStartSignal(); //stuur start signaal;
+                // stuur timer en start zelf timer
         }
-        return playtime;
+
     }
 
-    void scherm(int playtime){
-        auto scl     = hwlib::target::pin_oc( hwlib::target::pins::scl );
-        auto sda     = hwlib::target::pin_oc( hwlib::target::pins::sda );
-        auto i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda( scl, sda );
-        auto oled    = hwlib::glcd_oled( i2c_bus, 0x3c );
-        auto font    = hwlib::font_default_8x8();
+public:
+    initGameControl(sendIRMessageControl & sendIRMessage) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage){
 
-        auto w1 = hwlib::part(oled, hwlib::xy(0,0), hwlib::xy(128,64));
+    };
 
-        auto display = hwlib::terminal_from( w1, font );
+    void buttonPressed(int buttonID){
+        buttonPressedChannel.write(buttonID);
 
-        display << "\f" << "Kies de speeltijd"
-                << "\n"
-                << "\n" << "     - " << playtime << " + "
-                << hwlib::flush;
     }
 };
 

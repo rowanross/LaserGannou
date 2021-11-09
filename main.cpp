@@ -10,11 +10,6 @@ int main( void ){
 
     namespace target = hwlib::target;
 
-    receiveIRMessageControl receive;
-    for(;;){
-        hwlib::cout << receive.receiveMessage() << hwlib::endl;
-    }
-
 //    initGameControl initGame;
 //    initGame.startGame();
 
