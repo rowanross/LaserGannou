@@ -6,7 +6,7 @@
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
 
-class runGameControl{
+class runGameControl : public rtos::task <>{
 private:
     hwlib::target::pin_in trigger = hwlib::target::pin_in(hwlib::target::pins::d8);
 

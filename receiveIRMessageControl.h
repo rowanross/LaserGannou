@@ -4,17 +4,15 @@
 #include "hwlib.hpp"
 #include "rtos.hpp"
 
-class receiveIRMessageControl : public rtos::task <> {
+class receiveIRMessageControl : public rtos::task <>{
 private:
     hwlib::target::pin_in pin = hwlib::target::pin_in(hwlib::target::pins::d52);
     uint16_t data = 0x00;
-public:
-    receiveIRMessageControl() {}
+    int timer;
 
-    uint16_t receiveMessage() {
-        enum state_t {
-            IDLE, RECEIVE
-        };
+
+    void main(){
+        enum state_t {IDLE, RECEIVE};
         state_t state = IDLE;
         for (;;) {
             switch (state) {
@@ -29,7 +27,7 @@ public:
                 case RECEIVE: {
                     for (int i = 0; i < 16; i++) {
                         for (;;) {
-                            int timer = 0;
+                            timer = 0;
                             if (pin.read() == 0) {
                                 timer = hwlib::now_us();
                                 while (pin.read() == 0) {}
@@ -50,25 +48,33 @@ public:
                             }
                         }
                     }
-                    if (checkSum()) {
-                        return data;
-                    }
-                    return 0;
+                    //state = DATA;
                 }
+
+//                case DATA: {
+//                    state = IDLE;
+//                }
             }
         }
     }
 
-    bool checkSum() {
-        uint16_t message = receiveMessage();
-        for (unsigned int i = 1; i < 6; i++) {
-            bool bit = ((32768 >> i) ^ (32768 >> (i + 5)));
-            if (bit != (message & (32768 >> (i + 10)))) {
-                return false;
-            }
-        }
-        return true;
-    }
+public:
+    receiveIRMessageControl() {}
+
+
+//    bool checkSum(uint16_t message) {
+//
+//
+//        for (unsigned int i = 1; i < 6; i++) {
+//            uint16_t print = (32768 >> i) ^ (32768 >> (i + 5));
+//            hwlib::cout << print << hwlib::endl;
+//            bool bit = ((32768 >> i) ^ (32768 >> (i + 5)));
+//            if (bit != (message & (32768 >> (i + 10)))) {
+//                return false;
+//            }
+//        }
+//        return true;
+//    }
 };
 
 #endif //V2THDE_EXAMPLES_RECEIVEIRMESSAGECONTROL_H
