@@ -15,8 +15,6 @@ private:
     rtos::channel<buttonID, 5> buttonPressedChannel;
 
 
-    hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
-    hwlib::target::pin_oc sda = hwlib::target::pin_oc( hwlib::target::pins::sda );
 
     int gameState = 0;
 
@@ -24,12 +22,13 @@ private:
     static constexpr const int SETTIMING = 1;
     static constexpr const int SETWEAPONPOWER = 2;
     static constexpr const int GAME = 3;
-    auto oled;
+
+    hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
+    hwlib::target::pin_oc sda = hwlib::target::pin_oc( hwlib::target::pins::sda );
+    hwlib::i2c_bus_bit_banged_scl_sda i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda(scl, sda);
+    hwlib::glcd_oled oled = hwlib::glcd_oled(i2c_bus, 0x3c);
 
     void main() {
-        auto i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda(scl, sda);
-        auto oled = hwlib::glcd_oled(i2c_bus, 0x3c);
-
         auto w1 = hwlib::part(
                 oled,
                 hwlib::xy(0, 0),
