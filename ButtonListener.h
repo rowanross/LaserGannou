@@ -20,6 +20,7 @@ private:
 
     initGameControl & initGame;
     display & scherm;
+    // runGameControl runGame;
 
     void main(){
         for(;;) {
@@ -31,23 +32,27 @@ private:
             if (!minKnop.read()){
                 initGame.buttonPressed(2);
                 scherm.buttonPressed(2);
-                runGameControl.buttonPressed(1);
+                runGameControl.buttonPressed(2);
             }
             if(!menuKnop.read()){
                 initGame.buttonPressed(3);
                 scherm.buttonPressed(3);
-                runGameControl.buttonPressed(1);
+                runGameControl.buttonPressed(3);
             }
             if(!confirmKnop.read()){
                 initGame.buttonPressed(4);
                 scherm.buttonPressed(4);
-                runGameControl.buttonPressed(1);
+                runGameControl.buttonPressed(4);
             }
+            if(!trigger.read()){
+                initGame.buttonPressed(5);
+                runGameControl.buttonPressed(5);
+
         }
     }
 
 public:
-    ButtonListener(initGameControl & initGame, display & scherm): rtos::task<>("buttonListenerTask"), initGame(initGame), scherm(scherm){}
+    ButtonListener(initGameControl & initGame, display & scherm  /*, runGameControl runGame*/): rtos::task<>("buttonListenerTask"), initGame(initGame), scherm(scherm) /*, runGame(runGame)*/{}
 };
 
 
