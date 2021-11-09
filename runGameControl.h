@@ -6,21 +6,103 @@
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
 
-class runGameControl{
+struct killedBy {
+    unsigned int playerID;
+    unsigned int amount;
+};
+
+
+class runGameControl : public rtos::task <>{
 private:
-    hwlib::target::pin_in trigger = hwlib::target::pin_in(hwlib::target::pins::d8);
+    enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD};
+    state_t  state = IDLE;
+    rtos::pool <int> parametersPool;
+    rtos::pool<unsigned long int> countdownPool;
+    rtos::flag hitFlag;
+    rtos::flag parametersFlag;
+    rtos::timer countdownTimer;
+    rtos::clock gameClock;
+    rtos::channel<int, 5> buttonChannel;
+    killedBy kills[8];
+
+    int playerID;
+    int playtime;
+    int health = 100;
+    int weaponPower;
+    int cooldown = 0;
+    unsigned long int countdown = 10;
+
+    void main(){
+        for(;;){
+            switch(state){
+                case IDLE: {
+                    auto evt = wait(parametersFlag);
+                    if(evt == parametersFlag){
+                        state = COUNTDOWN;
+                    }
+                    break;
+                }
+                case COUNTDOWN: {
+                    playerID = parametersPool.read();
+                    weaponPower = parametersPool.read();
+                    playtime = parametersPool.read();
+                    countdownTimer.set(countdown);
+                    wait(countdownTimer);
+                    state = NORMAAL;
+                }
+                case NORMAAL: {
+                    if(evt == buttonChannel){
+                        if(buttonChannel.read() == 5){
+                            if(cooldown <= 0){
+                                state = SHOOT;
+                                break;
+                            }
+                        }
+                    }
+
+                    if(evt == gameClock){
+                        cooldown--;
+                        playtime--;
+                        if(playtime == 0){
+                            """Stop game, display press accept to transfer deaths"""
+                            break;
+                        }
+                        """display.showChange(gameTime);"""
+                    }
+                }
+                case SHOOT: {
+
+                }
+            }
+        }
+    }
 
 public:
-    runGameControl(hwlib::target::pin_in trigger = hwlib::target::pin_in(hwlib::target::pins::d8))
+    runGameControl():
+            rtos::task<>("RunGameTask"),
+            countdownTimer(this, "countdownTimer"),
+            gameClock(this, 1, "gameClock"),
+            parametersPool("parametersPool"),
+            buttonChannel(this, "buttonID"),
+            parametersFlag(this, "parametersFlag"),
+            hitFlag(this, "hitFlag")
     {}
 
-    //void setParameters
+    void setParams(int playerID, int weaponPower, int playtime){
+        parametersPool.write(playerID);
+        parametersPool.write(weaponPower);
+        parametersPool.write(playtime);
+        parametersFlag.set();
+    }
 
-    void shoot(){
-        //if trigger{
-        uint16_t message = 9999;
-        sendIRMessageControl sendMessage;
-        sendMessage.sendMessage(message);
+    void buttonPressed(int buttonID){
+        buttonChannel.write(buttonID);
+    }
+
+    void hitBy(int playerID, int weaponpower){
+        parametersPool.write(playerID);
+        parametersPool.write(weaponpower);
+        hitFlag.set();
     }
 
 };
