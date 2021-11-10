@@ -3,7 +3,7 @@
 //
 #include "hwlib.hpp"
 #include "rtos.hpp"
-//#include "display"
+#include "display.h"
 #include "sendIRMessageControl.h"
 
 
@@ -17,7 +17,9 @@ private:
     static constexpr int KIESTIMING = 2;
     static constexpr int SENDSTARTSIGNAL= 3;
 
+    rtos::event evt = wait(buttonPressedChannel);
     sendIRMessageControl & sendIRMessage;
+    display & scherm;
 
     rtos::channel<buttonID, 5> buttonPressedChannel;
 
@@ -25,29 +27,35 @@ private:
         namespace target = hwlib::target;
         int status = SYSTEMSTARTUP;
 
-        switch (status){
+        switch (status) {
             case SYSTEMSTARTUP:
-                display.showChange();
-                auto evt = wait(buttonPressedChannel);
-                if(evt == buttonPressedChannel){
+                scherm.showChange();
+                if (evt == buttonPressedChannel) {
                     if (buttonPressedChannel.read() != 0) {
                         status = KIESTIMING;
                     }
                 }
             case KIESTIMING:
-                display.showChange();
-                timer = 5; // zet timer op 5 min standaard;
-                if(buttonPressedChannel.read() == 1){
-                    timer+= 1;
-                    display.showChange();
-                }else if(buttonPressedChannel.read() == 2){
-                    display.showChange();
-                    timer-= 1;
+                scherm.showChange();
+                scherm.time = 5; // zet timer op 5 min standaard;
+                if (evt == buttonPressedChannel) {
+                    if (buttonPressedChannel.read() == 1) {
+                        scherm.time += 1;
+                        scherm.showChange();
+                    }
+                    if (buttonPressedChannel.read() == 2) {
+                        scherm.time -= 1;
+                        scherm.showChange();
+                    }
                 }
-                if(buttonPressedChannel.read() == 4){
+
+                if(evt == buttonPressedChannel && buttonPressedChannel.read() == 4){
+                    time = scherm.time;
                     status = SENDSTARTSIGNAL;
                 }
-            case SENDSTARTSIGNAL:
+
+
+                case SENDSTARTSIGNAL:
                 sendIRMessage.sendStartSignal(); //stuur start signaal;
                 // stuur timer en start zelf timer
         }
@@ -55,13 +63,14 @@ private:
     }
 
 public:
-    initGameControl(sendIRMessageControl & sendIRMessage) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage){
+    int time = 0;
+
+    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage), scherm(scherm){
 
     };
 
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
-
     }
 };
 
