@@ -27,9 +27,19 @@ private:
 public:
     sendIRMessageControl() : rtos::task<>("sendIRMessage"){}
 
-    void sendStartSignal(){}
-
     void sendMessage(uint16_t message){
+        for(unsigned int i = 0; i < 16; i++){
+            bool bit = (message & (32768 >> i));
+            if(bit){
+                sendOne();
+            }else{
+                sendZero();
+            }
+        }
+    }
+
+    void sendMessage(uint8_t playerID, uint8_t weaponpower){
+        uint16_t message = (((1 << 4) | playerID) << 2 | weaponpower) << 9;
         for(unsigned int i = 0; i < 16; i++){
             bool bit = (message & (32768 >> i));
             if(bit){
