@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['display_0',['display',['../classdisplay.html#a1385d21e9490cbf02de742f3e586d56a',1,'display']]]
+  ['cleardisplay_0',['clearDisplay',['../classdisplay.html#a276233f52804bfcf1740f8748055b5fa',1,'display']]]
 ];

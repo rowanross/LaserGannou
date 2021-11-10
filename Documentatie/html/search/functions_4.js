@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['hitby_0',['hitBy',['../classrun_game_control.html#a1033e5a9a4ac4568f8c4e996ba9f7f1e',1,'runGameControl']]]
+  ['gameparameterscontrol_0',['gameParametersControl',['../classgame_parameters_control.html#a05238dec09b5d81e4baf1122e7d2212b',1,'gameParametersControl']]]
 ];

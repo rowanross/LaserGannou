@@ -99,16 +99,18 @@ Inheritance diagram for runGameControl:</div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a3fa2726ddb6c5ac4b40a89a306aa641f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrun_game_control.html#a3fa2726ddb6c5ac4b40a89a306aa641f">runGameControl</a> (<a class="el" href="classbieper_control.html">bieperControl</a> &amp;bieper, <a class="el" href="classsend_i_r_message_control.html">sendIRMessageControl</a> &amp;IR)</td></tr>
-<tr class="separator:a3fa2726ddb6c5ac4b40a89a306aa641f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2cc2564c638d71d7e638d9929c5ae73f"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrun_game_control.html#a2cc2564c638d71d7e638d9929c5ae73f">runGameControl</a> (<a class="el" href="classbieper_control.html">bieperControl</a> &amp;bieper, <a class="el" href="classsend_i_r_message_control.html">sendIRMessageControl</a> &amp;IR, <a class="el" href="classdisplay.html">display</a> &amp;scherm, <a class="el" href="classtransfer_hit.html">transferHit</a> &amp;transfer)</td></tr>
+<tr class="separator:a2cc2564c638d71d7e638d9929c5ae73f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa30da84b8607c76b02d0d3eb1c69437e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrun_game_control.html#aa30da84b8607c76b02d0d3eb1c69437e">setParams</a> (int playerID, int weaponPower, int playtime)</td></tr>
+<tr class="separator:aa30da84b8607c76b02d0d3eb1c69437e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad54f0cd8408efd15ae331b911359c146"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrun_game_control.html#ad54f0cd8408efd15ae331b911359c146">buttonPressed</a> (int buttonID)</td></tr>
 <tr class="separator:ad54f0cd8408efd15ae331b911359c146"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1033e5a9a4ac4568f8c4e996ba9f7f1e"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classrun_game_control.html#a1033e5a9a4ac4568f8c4e996ba9f7f1e">hitBy</a> (int playerID, int weaponpower)</td></tr>
 <tr class="separator:a1033e5a9a4ac4568f8c4e996ba9f7f1e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a3fa2726ddb6c5ac4b40a89a306aa641f" name="a3fa2726ddb6c5ac4b40a89a306aa641f"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3fa2726ddb6c5ac4b40a89a306aa641f">&#9670;&nbsp;</a></span>runGameControl()</h2>
+<a id="a2cc2564c638d71d7e638d9929c5ae73f" name="a2cc2564c638d71d7e638d9929c5ae73f"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2cc2564c638d71d7e638d9929c5ae73f">&#9670;&nbsp;</a></span>runGameControl()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -126,7 +128,19 @@ Public Member Functions</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype"><a class="el" href="classsend_i_r_message_control.html">sendIRMessageControl</a> &amp;&#160;</td>
-          <td class="paramname"><em>IR</em>&#160;</td>
+          <td class="paramname"><em>IR</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classdisplay.html">display</a> &amp;&#160;</td>
+          <td class="paramname"><em>scherm</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype"><a class="el" href="classtransfer_hit.html">transferHit</a> &amp;&#160;</td>
+          <td class="paramname"><em>transfer</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -190,6 +204,48 @@ Public Member Functions</h2></td></tr>
           <td></td>
           <td class="paramtype">int&#160;</td>
           <td class="paramname"><em>weaponpower</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+
+</div>
+</div>
+<a id="aa30da84b8607c76b02d0d3eb1c69437e" name="aa30da84b8607c76b02d0d3eb1c69437e"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa30da84b8607c76b02d0d3eb1c69437e">&#9670;&nbsp;</a></span>setParams()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void runGameControl::setParams </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>playerID</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>weaponPower</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>playtime</em>&#160;</td>
         </tr>
         <tr>
           <td></td>

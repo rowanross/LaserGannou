@@ -90,83 +90,98 @@ $(document).ready(function(){initNavTree('receive_i_r_message_control_8h_source.
 <div class="line"><a id="l00003" name="l00003"></a><span class="lineno">    3</span> </div>
 <div class="line"><a id="l00004" name="l00004"></a><span class="lineno">    4</span><span class="preprocessor">#include &quot;hwlib.hpp&quot;</span></div>
 <div class="line"><a id="l00005" name="l00005"></a><span class="lineno">    5</span><span class="preprocessor">#include &quot;rtos.hpp&quot;</span></div>
-<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span> </div>
-<div class="line"><a id="l00007" name="l00007"></a><span class="lineno"><a class="line" href="classreceive_i_r_message_control.html">    7</a></span><span class="keyword">class </span><a class="code hl_class" href="classreceive_i_r_message_control.html">receiveIRMessageControl</a> : <span class="keyword">public</span> rtos::task &lt;&gt;{</div>
-<div class="line"><a id="l00008" name="l00008"></a><span class="lineno">    8</span><span class="keyword">private</span>:</div>
-<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span>    hwlib::target::pin_in pin = hwlib::target::pin_in(hwlib::target::pins::d52);</div>
-<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    uint16_t data = 0x00;</div>
-<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    <span class="keywordtype">int</span> timer;</div>
-<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span> </div>
-<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span> </div>
-<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    <span class="keywordtype">void</span> main(){</div>
-<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>        <span class="keyword">enum</span> state_t {IDLE, RECEIVE};</div>
-<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span>        state_t state = IDLE;</div>
-<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>        <span class="keywordflow">for</span> (;;) {</div>
-<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span>            <span class="keywordflow">switch</span> (state) {</div>
-<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span>                <span class="keywordflow">case</span> IDLE: {</div>
-<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>                    pin.refresh();</div>
-<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>                    <span class="keywordflow">if</span> (pin.read() == 0) {</div>
-<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>                        state = RECEIVE;</div>
-<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>                    }</div>
-<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>                    <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                }</div>
-<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span> </div>
-<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                <span class="keywordflow">case</span> RECEIVE: {</div>
-<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 16; i++) {</div>
-<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                        <span class="keywordflow">for</span> (;;) {</div>
-<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                            timer = 0;</div>
-<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                            <span class="keywordflow">if</span> (pin.read() == 0) {</div>
-<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span>                                timer = hwlib::now_us();</div>
-<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                                <span class="keywordflow">while</span> (pin.read() == 0) {}</div>
-<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>                                timer = (hwlib::now_us() - timer);</div>
-<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                            }</div>
-<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span> </div>
-<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                            <span class="keywordflow">if</span> (timer &gt;= 1200) {</div>
-<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                                data = data | 0x01;</div>
-<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                                <span class="keywordflow">if</span> (i &lt; 16) {</div>
-<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                                    data = data &lt;&lt; 1;</div>
-<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>                                }</div>
-<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span>                                <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (timer &gt;= 500 &amp;&amp; timer &lt; 1200) {</div>
-<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                                <span class="keywordflow">if</span> (i &lt; 15) {</div>
-<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                                    data = data &lt;&lt; 1;</div>
-<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                                }</div>
-<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                                <span class="keywordflow">break</span>;</div>
-<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                            }</div>
-<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                        }</div>
-<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                    }</div>
-<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                    <span class="comment">//state = DATA;</span></div>
-<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                }</div>
-<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span> </div>
-<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span><span class="comment">//                case DATA: {</span></div>
-<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span><span class="comment">//                    state = IDLE;</span></div>
-<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span><span class="comment">//                }</span></div>
-<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>            }</div>
-<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>        }</div>
-<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>    }</div>
-<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span> </div>
-<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span><span class="keyword">public</span>:</div>
-<div class="line"><a id="l00062" name="l00062"></a><span class="lineno"><a class="line" href="classreceive_i_r_message_control.html#ab123bff5cfc8f46620a523447d7fa117">   62</a></span>    <a class="code hl_function" href="classreceive_i_r_message_control.html#ab123bff5cfc8f46620a523447d7fa117">receiveIRMessageControl</a>() {}</div>
-<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span> </div>
-<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span> </div>
-<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span><span class="comment">//    bool checkSum(uint16_t message) {</span></div>
-<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span><span class="comment">//</span></div>
-<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span><span class="comment">//</span></div>
-<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span><span class="comment">//        for (unsigned int i = 1; i &lt; 6; i++) {</span></div>
-<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span><span class="comment">//            uint16_t print = (32768 &gt;&gt; i) ^ (32768 &gt;&gt; (i + 5));</span></div>
-<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span><span class="comment">//            hwlib::cout &lt;&lt; print &lt;&lt; hwlib::endl;</span></div>
-<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span><span class="comment">//            bool bit = ((32768 &gt;&gt; i) ^ (32768 &gt;&gt; (i + 5)));</span></div>
-<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span><span class="comment">//            if (bit != (message &amp; (32768 &gt;&gt; (i + 10)))) {</span></div>
-<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span><span class="comment">//                return false;</span></div>
-<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span><span class="comment">//            }</span></div>
-<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="comment">//        }</span></div>
-<div class="line"><a id="l00076" name="l00076"></a><span class="lineno">   76</span><span class="comment">//        return true;</span></div>
-<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span><span class="comment">//    }</span></div>
-<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span>};</div>
-<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span> </div>
-<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="preprocessor">#endif </span><span class="comment">//V2THDE_EXAMPLES_RECEIVEIRMESSAGECONTROL_H</span></div>
-<div class="ttc" id="aclassreceive_i_r_message_control_html"><div class="ttname"><a href="classreceive_i_r_message_control.html">receiveIRMessageControl</a></div><div class="ttdef"><b>Definition:</b> receiveIRMessageControl.h:7</div></div>
-<div class="ttc" id="aclassreceive_i_r_message_control_html_ab123bff5cfc8f46620a523447d7fa117"><div class="ttname"><a href="classreceive_i_r_message_control.html#ab123bff5cfc8f46620a523447d7fa117">receiveIRMessageControl::receiveIRMessageControl</a></div><div class="ttdeci">receiveIRMessageControl()</div><div class="ttdef"><b>Definition:</b> receiveIRMessageControl.h:62</div></div>
+<div class="line"><a id="l00006" name="l00006"></a><span class="lineno">    6</span><span class="preprocessor">#include &quot;<a class="code" href="game_parameters_control_8h.html">gameParametersControl.h</a>&quot;</span></div>
+<div class="line"><a id="l00007" name="l00007"></a><span class="lineno">    7</span> </div>
+<div class="line"><a id="l00008" name="l00008"></a><span class="lineno"><a class="line" href="classreceive_i_r_message_control.html">    8</a></span><span class="keyword">class </span><a class="code hl_class" href="classreceive_i_r_message_control.html">receiveIRMessageControl</a> : <span class="keyword">public</span> rtos::task &lt;&gt;{</div>
+<div class="line"><a id="l00009" name="l00009"></a><span class="lineno">    9</span><span class="keyword">private</span>:</div>
+<div class="line"><a id="l00010" name="l00010"></a><span class="lineno">   10</span>    hwlib::target::pin_in pin = hwlib::target::pin_in(hwlib::target::pins::d52);</div>
+<div class="line"><a id="l00011" name="l00011"></a><span class="lineno">   11</span>    uint16_t data = 0x00;</div>
+<div class="line"><a id="l00012" name="l00012"></a><span class="lineno">   12</span>    <span class="keywordtype">int</span> timer;</div>
+<div class="line"><a id="l00013" name="l00013"></a><span class="lineno">   13</span>    uint8_t playerID;</div>
+<div class="line"><a id="l00014" name="l00014"></a><span class="lineno">   14</span>    uint8_t weaponPower;</div>
+<div class="line"><a id="l00015" name="l00015"></a><span class="lineno">   15</span>    uint8_t playtime;</div>
+<div class="line"><a id="l00016" name="l00016"></a><span class="lineno">   16</span> </div>
+<div class="line"><a id="l00017" name="l00017"></a><span class="lineno">   17</span>    <a class="code hl_class" href="classgame_parameters_control.html">gameParametersControl</a> &amp; parameters;</div>
+<div class="line"><a id="l00018" name="l00018"></a><span class="lineno">   18</span> </div>
+<div class="line"><a id="l00019" name="l00019"></a><span class="lineno">   19</span> </div>
+<div class="line"><a id="l00020" name="l00020"></a><span class="lineno">   20</span>    <span class="keywordtype">void</span> main(){</div>
+<div class="line"><a id="l00021" name="l00021"></a><span class="lineno">   21</span>        <span class="keyword">enum</span> state_t {IDLE, RECEIVE, STARTGAME};</div>
+<div class="line"><a id="l00022" name="l00022"></a><span class="lineno">   22</span>        state_t state = IDLE;</div>
+<div class="line"><a id="l00023" name="l00023"></a><span class="lineno">   23</span>        <span class="keywordflow">for</span> (;;) {</div>
+<div class="line"><a id="l00024" name="l00024"></a><span class="lineno">   24</span>            <span class="keywordflow">switch</span> (state) {</div>
+<div class="line"><a id="l00025" name="l00025"></a><span class="lineno">   25</span>                <span class="keywordflow">case</span> IDLE: {</div>
+<div class="line"><a id="l00026" name="l00026"></a><span class="lineno">   26</span>                    pin.refresh();</div>
+<div class="line"><a id="l00027" name="l00027"></a><span class="lineno">   27</span>                    <span class="keywordflow">if</span> (pin.read() == 0) {</div>
+<div class="line"><a id="l00028" name="l00028"></a><span class="lineno">   28</span>                        state = RECEIVE;</div>
+<div class="line"><a id="l00029" name="l00029"></a><span class="lineno">   29</span>                    }</div>
+<div class="line"><a id="l00030" name="l00030"></a><span class="lineno">   30</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00031" name="l00031"></a><span class="lineno">   31</span>                }</div>
+<div class="line"><a id="l00032" name="l00032"></a><span class="lineno">   32</span> </div>
+<div class="line"><a id="l00033" name="l00033"></a><span class="lineno">   33</span>                <span class="keywordflow">case</span> RECEIVE: {</div>
+<div class="line"><a id="l00034" name="l00034"></a><span class="lineno">   34</span>                    <span class="keywordflow">for</span> (<span class="keywordtype">int</span> i = 0; i &lt; 16; i++) {</div>
+<div class="line"><a id="l00035" name="l00035"></a><span class="lineno">   35</span>                        <span class="keywordflow">for</span> (;;) {</div>
+<div class="line"><a id="l00036" name="l00036"></a><span class="lineno">   36</span>                            timer = 0;</div>
+<div class="line"><a id="l00037" name="l00037"></a><span class="lineno">   37</span>                            <span class="keywordflow">if</span> (pin.read() == 0) {</div>
+<div class="line"><a id="l00038" name="l00038"></a><span class="lineno">   38</span>                                timer = hwlib::now_us();</div>
+<div class="line"><a id="l00039" name="l00039"></a><span class="lineno">   39</span>                                <span class="keywordflow">while</span> (pin.read() == 0) {}</div>
+<div class="line"><a id="l00040" name="l00040"></a><span class="lineno">   40</span>                                timer = (hwlib::now_us() - timer);</div>
+<div class="line"><a id="l00041" name="l00041"></a><span class="lineno">   41</span>                            }</div>
+<div class="line"><a id="l00042" name="l00042"></a><span class="lineno">   42</span> </div>
+<div class="line"><a id="l00043" name="l00043"></a><span class="lineno">   43</span>                            <span class="keywordflow">if</span> (timer &gt;= 1200) {</div>
+<div class="line"><a id="l00044" name="l00044"></a><span class="lineno">   44</span>                                data = data | 0x01;</div>
+<div class="line"><a id="l00045" name="l00045"></a><span class="lineno">   45</span>                                <span class="keywordflow">if</span> (i &lt; 16) {</div>
+<div class="line"><a id="l00046" name="l00046"></a><span class="lineno">   46</span>                                    data = data &lt;&lt; 1;</div>
+<div class="line"><a id="l00047" name="l00047"></a><span class="lineno">   47</span>                                }</div>
+<div class="line"><a id="l00048" name="l00048"></a><span class="lineno">   48</span>                                <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00049" name="l00049"></a><span class="lineno">   49</span>                            } <span class="keywordflow">else</span> <span class="keywordflow">if</span> (timer &gt;= 500 &amp;&amp; timer &lt; 1200) {</div>
+<div class="line"><a id="l00050" name="l00050"></a><span class="lineno">   50</span>                                <span class="keywordflow">if</span> (i &lt; 15) {</div>
+<div class="line"><a id="l00051" name="l00051"></a><span class="lineno">   51</span>                                    data = data &lt;&lt; 1;</div>
+<div class="line"><a id="l00052" name="l00052"></a><span class="lineno">   52</span>                                }</div>
+<div class="line"><a id="l00053" name="l00053"></a><span class="lineno">   53</span>                                <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00054" name="l00054"></a><span class="lineno">   54</span>                            }</div>
+<div class="line"><a id="l00055" name="l00055"></a><span class="lineno">   55</span>                        }</div>
+<div class="line"><a id="l00056" name="l00056"></a><span class="lineno">   56</span>                    }</div>
+<div class="line"><a id="l00057" name="l00057"></a><span class="lineno">   57</span>                    playerID = (data &gt;&gt; 11) &amp; 0b1111;</div>
+<div class="line"><a id="l00058" name="l00058"></a><span class="lineno">   58</span>                    weaponPower = (data &gt;&gt; 9) &amp; 0b11;</div>
+<div class="line"><a id="l00059" name="l00059"></a><span class="lineno">   59</span>                    playtime = (data &gt;&gt; 4) &amp; 0b11111;</div>
+<div class="line"><a id="l00060" name="l00060"></a><span class="lineno">   60</span>                    state = STARTGAME;</div>
+<div class="line"><a id="l00061" name="l00061"></a><span class="lineno">   61</span>                }</div>
+<div class="line"><a id="l00062" name="l00062"></a><span class="lineno">   62</span> </div>
+<div class="line"><a id="l00063" name="l00063"></a><span class="lineno">   63</span>                <span class="keywordflow">case</span> STARTGAME: {</div>
+<div class="line"><a id="l00064" name="l00064"></a><span class="lineno">   64</span>                    <span class="keywordflow">if</span>(weaponPower == 0b00){</div>
+<div class="line"><a id="l00065" name="l00065"></a><span class="lineno">   65</span>                        parameters.<a class="code hl_function" href="classgame_parameters_control.html#a90103948c8a56c14b72fb4283e71f5e3">Start</a>();</div>
+<div class="line"><a id="l00066" name="l00066"></a><span class="lineno">   66</span>                    }</div>
+<div class="line"><a id="l00067" name="l00067"></a><span class="lineno">   67</span> </div>
+<div class="line"><a id="l00068" name="l00068"></a><span class="lineno">   68</span>                    state = IDLE;</div>
+<div class="line"><a id="l00069" name="l00069"></a><span class="lineno">   69</span>                    <span class="keywordflow">break</span>;</div>
+<div class="line"><a id="l00070" name="l00070"></a><span class="lineno">   70</span>                }</div>
+<div class="line"><a id="l00071" name="l00071"></a><span class="lineno">   71</span>            }</div>
+<div class="line"><a id="l00072" name="l00072"></a><span class="lineno">   72</span>        }</div>
+<div class="line"><a id="l00073" name="l00073"></a><span class="lineno">   73</span>    }</div>
+<div class="line"><a id="l00074" name="l00074"></a><span class="lineno">   74</span> </div>
+<div class="line"><a id="l00075" name="l00075"></a><span class="lineno">   75</span><span class="keyword">public</span>:</div>
+<div class="line"><a id="l00076" name="l00076"></a><span class="lineno"><a class="line" href="classreceive_i_r_message_control.html#a6c4875699f82cbe7274c67cf6ad34c29">   76</a></span>    <a class="code hl_function" href="classreceive_i_r_message_control.html#a6c4875699f82cbe7274c67cf6ad34c29">receiveIRMessageControl</a>(<a class="code hl_class" href="classgame_parameters_control.html">gameParametersControl</a> &amp; parameters) : rtos::task&lt;&gt;(<span class="stringliteral">&quot;receiveIRMessageControlTaak&quot;</span>), parameters(parameters) {}</div>
+<div class="line"><a id="l00077" name="l00077"></a><span class="lineno">   77</span> </div>
+<div class="line"><a id="l00078" name="l00078"></a><span class="lineno">   78</span> </div>
+<div class="line"><a id="l00079" name="l00079"></a><span class="lineno">   79</span><span class="comment">//    bool checkSum(uint16_t message) {</span></div>
+<div class="line"><a id="l00080" name="l00080"></a><span class="lineno">   80</span><span class="comment">//        for (unsigned int i = 1; i &lt; 6; i++) {</span></div>
+<div class="line"><a id="l00081" name="l00081"></a><span class="lineno">   81</span><span class="comment">//            uint16_t print = (32768 &gt;&gt; i) ^ (32768 &gt;&gt; (i + 5));</span></div>
+<div class="line"><a id="l00082" name="l00082"></a><span class="lineno">   82</span><span class="comment">//            hwlib::cout &lt;&lt; print &lt;&lt; hwlib::endl;</span></div>
+<div class="line"><a id="l00083" name="l00083"></a><span class="lineno">   83</span><span class="comment">//            bool bit = ((32768 &gt;&gt; i) ^ (32768 &gt;&gt; (i + 5)));</span></div>
+<div class="line"><a id="l00084" name="l00084"></a><span class="lineno">   84</span><span class="comment">//            if (bit != (message &amp; (32768 &gt;&gt; (i + 10)))) {</span></div>
+<div class="line"><a id="l00085" name="l00085"></a><span class="lineno">   85</span><span class="comment">//                return false;</span></div>
+<div class="line"><a id="l00086" name="l00086"></a><span class="lineno">   86</span><span class="comment">//            }</span></div>
+<div class="line"><a id="l00087" name="l00087"></a><span class="lineno">   87</span><span class="comment">//        }</span></div>
+<div class="line"><a id="l00088" name="l00088"></a><span class="lineno">   88</span><span class="comment">//        return true;</span></div>
+<div class="line"><a id="l00089" name="l00089"></a><span class="lineno">   89</span><span class="comment">//    }</span></div>
+<div class="line"><a id="l00090" name="l00090"></a><span class="lineno">   90</span>};</div>
+<div class="line"><a id="l00091" name="l00091"></a><span class="lineno">   91</span> </div>
+<div class="line"><a id="l00092" name="l00092"></a><span class="lineno">   92</span><span class="preprocessor">#endif </span><span class="comment">//V2THDE_EXAMPLES_RECEIVEIRMESSAGECONTROL_H</span></div>
+<div class="ttc" id="aclassgame_parameters_control_html"><div class="ttname"><a href="classgame_parameters_control.html">gameParametersControl</a></div><div class="ttdef"><b>Definition:</b> gameParametersControl.h:8</div></div>
+<div class="ttc" id="aclassgame_parameters_control_html_a90103948c8a56c14b72fb4283e71f5e3"><div class="ttname"><a href="classgame_parameters_control.html#a90103948c8a56c14b72fb4283e71f5e3">gameParametersControl::Start</a></div><div class="ttdeci">void Start()</div><div class="ttdef"><b>Definition:</b> gameParametersControl.h:88</div></div>
+<div class="ttc" id="aclassreceive_i_r_message_control_html"><div class="ttname"><a href="classreceive_i_r_message_control.html">receiveIRMessageControl</a></div><div class="ttdef"><b>Definition:</b> receiveIRMessageControl.h:8</div></div>
+<div class="ttc" id="aclassreceive_i_r_message_control_html_a6c4875699f82cbe7274c67cf6ad34c29"><div class="ttname"><a href="classreceive_i_r_message_control.html#a6c4875699f82cbe7274c67cf6ad34c29">receiveIRMessageControl::receiveIRMessageControl</a></div><div class="ttdeci">receiveIRMessageControl(gameParametersControl &amp;parameters)</div><div class="ttdef"><b>Definition:</b> receiveIRMessageControl.h:76</div></div>
+<div class="ttc" id="agame_parameters_control_8h_html"><div class="ttname"><a href="game_parameters_control_8h.html">gameParametersControl.h</a></div></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->

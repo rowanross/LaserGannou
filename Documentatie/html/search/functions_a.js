@@ -1,8 +1,6 @@
 var searchData=
 [
-  ['sendirmessagecontrol_0',['sendIRMessageControl',['../classsend_i_r_message_control.html#a54296345d902ed1f6d19649a7ba4ff33',1,'sendIRMessageControl']]],
-  ['sendmessage_1',['sendMessage',['../classsend_i_r_message_control.html#aaa4f0d596a949dc8b0360c2ca645e056',1,'sendIRMessageControl::sendMessage(uint16_t message)'],['../classsend_i_r_message_control.html#a2686614b44a1c320c41c69f640a250f0',1,'sendIRMessageControl::sendMessage(uint8_t playerID, uint8_t weaponpower)']]],
-  ['setparams_2',['setParams',['../classgame_parameters_control.html#a6d9c2cdd16589f4d051f8894134f0552',1,'gameParametersControl']]],
-  ['showchange_3',['showChange',['../classdisplay.html#a5617362a12f77693dd5893fda4cf4e1e',1,'display']]],
-  ['showtiming_4',['ShowTiming',['../classdisplay.html#a8fcdc38648d24a438419c8cc367e4ac5',1,'display']]]
+  ['receiveirmessagecontrol_0',['receiveIRMessageControl',['../classreceive_i_r_message_control.html#a6c4875699f82cbe7274c67cf6ad34c29',1,'receiveIRMessageControl']]],
+  ['rtttl_5fplay_1',['rtttl_play',['../rtttl__player_8cpp.html#a686c5cb2c33a381217dfaa795c018d87',1,'rtttl_play(note_player &amp;lsp, const char *s):&#160;rtttl_player.cpp'],['../rtttl__player_8hpp.html#a686c5cb2c33a381217dfaa795c018d87',1,'rtttl_play(note_player &amp;lsp, const char *s):&#160;rtttl_player.cpp']]],
+  ['rungamecontrol_2',['runGameControl',['../classrun_game_control.html#a2cc2564c638d71d7e638d9929c5ae73f',1,'runGameControl']]]
 ];
