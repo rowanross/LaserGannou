@@ -20,6 +20,8 @@ private:
     static constexpr int GETPARAMETERS = 2;
     static constexpr int STARTGAME= 3;
 
+    rtos::flag Startflag;
+
     uint16_t playtime = 0;
     uint16_t playerID = 0;
     uint16_t weaponPower = 0;
@@ -70,7 +72,8 @@ private:
 public:
     gameParametersControl(runGameControl & runGame):
             rtos::task<>("parametersControlTaak"),
-            runGame(runGame)
+            runGame(runGame),
+            Startflag(this, "Startflag")
     {}
 
     void setParams(uint16_t playerID_r, uint16_t playtime_r){
@@ -81,6 +84,8 @@ public:
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
     }
+
+    void Start(){Startflag.set();}
 };
 
 

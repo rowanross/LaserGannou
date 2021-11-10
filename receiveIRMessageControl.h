@@ -3,16 +3,22 @@
 
 #include "hwlib.hpp"
 #include "rtos.hpp"
+#include "gameParametersControl.h"
 
 class receiveIRMessageControl : public rtos::task <>{
 private:
     hwlib::target::pin_in pin = hwlib::target::pin_in(hwlib::target::pins::d52);
     uint16_t data = 0x00;
     int timer;
+    uint8_t playerID;
+    uint8_t weaponPower;
+    uint8_t playtime;
+
+    gameParametersControl & parameters;
 
 
     void main(){
-        enum state_t {IDLE, RECEIVE};
+        enum state_t {IDLE, RECEIVE, STARTGAME};
         state_t state = IDLE;
         for (;;) {
             switch (state) {
@@ -48,23 +54,29 @@ private:
                             }
                         }
                     }
-                    //state = DATA;
+                    playerID = (data >> 11) & 0b1111;
+                    weaponPower = (data >> 9) & 0b11;
+                    playtime = (data >> 4) & 0b11111;
+                    state = STARTGAME;
                 }
 
-//                case DATA: {
-//                    state = IDLE;
-//                }
+                case STARTGAME: {
+                    if(weaponPower == 0b00){
+                        parameters.Start();
+                    }
+
+                    state = IDLE;
+                    break;
+                }
             }
         }
     }
 
 public:
-    receiveIRMessageControl() {}
+    receiveIRMessageControl(gameParametersControl & parameters) : rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
 
 
 //    bool checkSum(uint16_t message) {
-//
-//
 //        for (unsigned int i = 1; i < 6; i++) {
 //            uint16_t print = (32768 >> i) ^ (32768 >> (i + 5));
 //            hwlib::cout << print << hwlib::endl;
