@@ -57,7 +57,7 @@ private:
             case SENDSTARTSIGNAL:
                 for(;;){
                     playerID++;
-                    message = ((((1 << 4) | playerID) << 2 | weaponpower) << 5) | playtime;
+                    message = (((((1 << 4) | playerID) << 2 | weaponpower) << 5) | playtime) << 4;
                     sendIRMessage.sendMessage(message); //stuur start signaal
                     if (buttonChannel.read() = 4){
                         gameParametersControl.setParams(0x00, playtime);

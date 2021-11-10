@@ -14,8 +14,6 @@ private:
 
     rtos::channel<buttonID, 5> buttonPressedChannel;
 
-
-
     int gameState = 0;
 
     static constexpr const int PRE_GAME = 0;
@@ -28,21 +26,39 @@ private:
     hwlib::i2c_bus_bit_banged_scl_sda i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda(scl, sda);
     hwlib::glcd_oled oled = hwlib::glcd_oled(i2c_bus, 0x3c);
 
+    hwlib::window_part_t w1 = hwlib::part(
+            oled,
+            hwlib::xy(0, 0),
+            hwlib::xy(128, 32));
+    hwlib::window_part_t w4 = hwlib::part(
+            oled,
+            hwlib::xy( 0, 0 ),
+            hwlib::xy( 128, 16));
+    hwlib::window_part_t w5 = hwlib::part(
+            oled,
+            hwlib::xy( 0, 16 ),
+            hwlib::xy( 128, 16));
+    hwlib::window_part_t w6 = hwlib::part(
+            oled,
+            hwlib::xy( 0, 32 ),
+            hwlib::xy( 128, 16));
+
+    // voor grote texten
+    hwlib::font_default_16x16 f1 = hwlib::font_default_16x16();
+    hwlib::terminal_from d1 = hwlib::terminal_from(w1, f1);
+
+    //voor +- keuzes
+    hwlib::font_default_8x8 f3 = hwlib::font_default_8x8();
+    hwlib::terminal_from d4 = hwlib::terminal_from( w4, f3 );
+    hwlib::terminal_from d5 = hwlib::terminal_from( w5, f3 );
+    hwlib::terminal_from d6 = hwlib::terminal_from( w6, f3 );
+
+    int time = 5;
+    int power = 1;
+
+
     void main() {
-        auto w1 = hwlib::part(
-                oled,
-                hwlib::xy(0, 0),
-                hwlib::xy(128, 32));
-        auto w2 = hwlib::part(
-                oled,
-                hwlib::xy(0, 32),
-                hwlib::xy(128, 32));
 
-        auto f1 = hwlib::font_default_16x16();
-        auto d1 = hwlib::terminal_from(w1, f1);
-
-        auto f2 = hwlib::font_default_8x8();
-        auto d2 = hwlib::terminal_from(w2, f2);
 
 
         switch (gameState){
@@ -57,26 +73,6 @@ private:
 
             case SETTIMING:
                 // Momenteel enkel voor het 'opgeven' van de tijd in de int time. Deze zal in gameParameter verder moeten worden verwerkt;
-
-                auto w4 = hwlib::part(
-                        oled,
-                        hwlib::xy( 0, 0 ),
-                        hwlib::xy( 128, 16));
-                auto w5 = hwlib::part(
-                        oled,
-                        hwlib::xy( 0, 16 ),
-                        hwlib::xy( 128, 32));
-                auto w6 = hwlib::part(
-                        oled,
-                        hwlib::xy( 0, 32 ),
-                        hwlib::xy( 128, 48));
-
-                auto f3 = hwlib::font_default_8x8();
-                auto d4 = hwlib::terminal_from( w4, f1 );
-                auto d5 = hwlib::terminal_from( w5, f1 );
-                auto d6 = hwlib::terminal_from( w6, f1 );
-
-                int time = 5;
                 d4 << "\f"
                    << "    Geef uw \n  timing:";
                 d5 << "\f"
@@ -84,17 +80,16 @@ private:
                 d6 << "\f"
                    << "     -  " << time << "  +";
                 if (buttonPressedChannel.read() == 1) {
-                    time++;
+                    // timing wordt toegevoegd in initGameControl
                     showChange();
                 }
                 if (buttonPressedChannel.read() == 2) {
-                    time++;
+                    //zie bovenstaande comment
                     showChange();
                 }
                 if (buttonPressedChannel.read() = 4){
                     d1 << "\f"
                        << "u sure?";
-                    d2 << "\f";
                     if (buttonPressedChannel.read() = 4) {
                         gameState = SETWEAPONPOWER;
                     }else if (buttonPressedChannel.read() = 3){
@@ -104,11 +99,10 @@ private:
 
 
             case SETWEAPONPOWER:
-                int power = 1;
                 d4 << "\f"
                    << "    Geef uw \n  weaponpower:";
                 d5 << "\f"
-                   << "" << hwlib::flush;
+                   << "WeaponPower";
                 d6 << "\f"
                    << "     -  " << power << "  +";
 
@@ -120,44 +114,51 @@ private:
                     power++;
                     showChange();
                 }
-                 if (buttonPressedChannel.read() = 4){
+                if (buttonPressedChannel.read() = 4) {
                     d1 << "\f"
                        << "u sure?";
-                    d2 << "\f";
                     if (buttonPressedChannel.read() = 4) {
                         gameState = GAME;
-                    }else if (buttonPressedChannel.read() = 3){
+                    } else if (buttonPressedChannel.read() = 3) {
                         gameState = SETWEAPONPOWER;
                     }
+                }
 
-                break;
-
-            case GAME:
+                case GAME:
 
                 // show time
-                // show playerNr
+                //runGameControl timer ophalen.
+
                 break;
             }
-
-        }
     }
 
 
+
 public:
+
     display(): rtos::task<>("schermTaak"){}
+
+
+    void ShowTiming(int timeLeft){
+        d4  << "\f"
+            << " " << timeLeft << " ";
+        d5  << " \nseconds left";
+        d6  << "\f";
+
+        showChange();
+    }
 
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
     }
 
     void showChange(){
-        for (;;){
             oled.flush();
-        }
         //update het huidige scherm;
     }
 
-};
+}
 
 
 #endif //V2THDE_EXAMPLES_DISPLAY_H
