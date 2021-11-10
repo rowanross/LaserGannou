@@ -133,8 +133,8 @@ public:
 
     void showConfirm(){
         d4 << "druk aub op de";
-        d5 << "confirm knop";
-        d6 << "\f";
+        d5 << "confirm knop,";
+        d6 << "if(connected met pc)";
     }
 
 

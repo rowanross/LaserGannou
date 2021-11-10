@@ -76,7 +76,7 @@ private:
                         playtime--;
                         scherm.ShowTiming(playtime);
                         if(playtime == 0){
-                            """display press accept to transfer deaths"""
+                            scherm.showConfirm();
                             state = TRANSFER;
                             break;
                         }
