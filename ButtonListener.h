@@ -5,7 +5,6 @@
 #include "rtos.hpp"
 #include "initGameControl.h"
 #include "runGameControl.h"
-#include "display.h"
 
 #ifndef V2THDE_EXAMPLES_BUTTONLISTENER_H
 #define V2THDE_EXAMPLES_BUTTONLISTENER_H
@@ -27,22 +26,18 @@ private:
         for (;;) {
             if (!plusKnop.read()) {
                 initGame.buttonPressed(1);
-                scherm.buttonPressed(1);
                 runGame.buttonPressed(1);
             }
             if (!minKnop.read()) {
                 initGame.buttonPressed(2);
-                scherm.buttonPressed(2);
                 runGame.buttonPressed(2);
             }
             if (!menuKnop.read()) {
                 initGame.buttonPressed(3);
-                scherm.buttonPressed(3);
                 runGame.buttonPressed(3);
             }
             if (!confirmKnop.read()) {
                 initGame.buttonPressed(4);
-                scherm.buttonPressed(4);
                 runGame.buttonPressed(4);
             }
             if (!trigger.read()) {
@@ -53,7 +48,9 @@ private:
     }
 
 public:
-    ButtonListener(initGameControl & initGame, display & scherm, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame), scherm(scherm) , runGame(runGame){}
+
+    ButtonListener(initGameControl & initGame, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame) , runGame(runGame){}
+
 };
 
 

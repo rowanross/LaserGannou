@@ -11,17 +11,7 @@
 
 class display : public rtos::task<>{
 private:
-
-    rtos::channel<int, 5> buttonPressedChannel;
-
-    int gameState = 0;
-
-    static constexpr const int PRE_GAME = 0;
-    static constexpr const int SETTIMING = 1;
-    static constexpr const int SETWEAPONPOWER = 2;
-    static constexpr const int GAME = 3;
-
-    hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
+        hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
     hwlib::target::pin_oc sda = hwlib::target::pin_oc( hwlib::target::pins::sda );
     hwlib::i2c_bus_bit_banged_scl_sda i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda(scl, sda);
     hwlib::glcd_oled oled = hwlib::glcd_oled(i2c_bus, 0x3c);
@@ -63,8 +53,7 @@ public:
     int power = 1;
 
     display():
-        rtos::task<>("schermTaak"),
-        buttonPressedChannel(this, "buttonID")
+        rtos::task<>("schermTaak")
     {}
 
     void preGame(){
@@ -109,7 +98,6 @@ public:
         d6 << "if(connected met pc)";
     }
 
-
     void showChange(){
         oled.flush();
         //update het huidige scherm;
@@ -133,13 +121,6 @@ public:
         showChange();
 
     }
-
-    void buttonPressed(int buttonID){
-        buttonPressedChannel.write(buttonID);
-    }
-
-
-
 };
 
 
