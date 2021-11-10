@@ -10,7 +10,7 @@
 #include "display.h"
 
 struct killedBy {
-    unsigned int playerID = 0;
+    unsigned int playerCode = 0;
     unsigned int amount = 0;
 };
 
@@ -106,7 +106,7 @@ private:
                 case DEAD: {
                     revivalTimer.set(10);
                     int ID = parametersPool.read();
-                    kills[ID-1].playerID = ID;
+                    kills[ID-1].playerCode = ID;
                     kills[ID-1].amount++;
                     bieper.playDeathSound();
                     wait(revivalTimer);

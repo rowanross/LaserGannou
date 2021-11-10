@@ -9,7 +9,7 @@ public:
     void transferData(const killedBy kills[9]){
         hwlib::wait_ms(200);
         for (const auto & x : kills){
-            hwlib::cout << x.playerID << ","<< x.amount << "\n";
+            hwlib::cout << x.playerCode << ","<< x.amount << "\n";
         }
     }
 };
