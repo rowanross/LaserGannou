@@ -5,11 +5,12 @@
 #include "rtos.hpp"
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
+#include "transferHitControl.hpp"
 #include "bieperControl.h"
 #include "display.h"
 
 struct killedBy {
-    unsigned int playerID;
+    unsigned int playerID = 0;
     unsigned int amount = 0;
 };
 
@@ -19,7 +20,6 @@ private:
     enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
     state_t  state = IDLE;
     rtos::pool <int> parametersPool;
-    rtos::pool<unsigned long int> countdownPool;
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
     rtos::flag transferFlag;
@@ -116,6 +116,11 @@ private:
                 }
                 case TRANSFER: {
                     auto evt = wait(transferFlag);
+                    if(evt == buttonChannel){
+                        if(buttonChannel.read() == 4){
+
+                        }
+                    }
                     if(evt == transferFlag){
                         scherm.clearDisplay();
                         state = IDLE;
