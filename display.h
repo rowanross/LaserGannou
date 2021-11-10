@@ -60,13 +60,12 @@ private:
     void main() {
 
 
-
-        switch (gameState){
+        switch (gameState) {
             case PRE_GAME:
                 // als hij net aan gaat dan kan hij hier wat extra gegevens dan wel opvragen dan checken.
                 d1 << "\f"
                    << "press \n any \n button";
-                if(buttonPressedChannel.read() != 0){
+                if (buttonPressedChannel.read() != 0) {
                     showChange();
                     gameState = SETTIMING;
                 }
@@ -87,12 +86,12 @@ private:
                     //zie bovenstaande comment
                     showChange();
                 }
-                if (buttonPressedChannel.read() = 4){
+                if (buttonPressedChannel.read() = 4) {
                     d1 << "\f"
                        << "u sure?";
                     if (buttonPressedChannel.read() = 4) {
                         gameState = SETWEAPONPOWER;
-                    }else if (buttonPressedChannel.read() = 3){
+                    } else if (buttonPressedChannel.read() = 3) {
                         gameState = SETTIMING;
                     }
                 }
@@ -115,30 +114,27 @@ private:
                     showChange();
                 }
                 if (buttonPressedChannel.read() = 4) {
-                    d1 << "\f"
-                       << "u sure?";
-                    if (buttonPressedChannel.read() = 4) {
-                        gameState = GAME;
-                    } else if (buttonPressedChannel.read() = 3) {
-                        gameState = SETWEAPONPOWER;
-                    }
+                    gameState = GAME;
+
                 }
 
-                case GAME:
-
+            case GAME:
+                oled.flush();
                 // show time
                 //runGameControl timer ophalen.
 
                 break;
-            }
+        }
     }
-
-
 
 public:
 
     display(): rtos::task<>("schermTaak"){}
 
+    void showChange(){
+        oled.flush();
+        //update het huidige scherm;
+    }
 
     void ShowTiming(int timeLeft){
         d4  << "\f"
@@ -149,14 +145,21 @@ public:
         showChange();
     }
 
+    void clearDisplay(){
+        d1 << "\f";
+        d4 << "\f";
+        d5 << "\f";
+        d6 << "\f";
+
+        showChange();
+
+    }
+
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
     }
 
-    void showChange(){
-            oled.flush();
-        //update het huidige scherm;
-    }
+
 
 }
 
