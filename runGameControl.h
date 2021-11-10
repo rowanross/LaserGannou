@@ -5,6 +5,7 @@
 #include "rtos.hpp"
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
+#include "bieperControl.h"
 
 struct killedBy {
     unsigned int playerID;
@@ -25,6 +26,8 @@ private:
     rtos::timer reloadTimer;
     rtos::clock gameClock;
     rtos::channel<int, 5> buttonChannel;
+    bieperControl & bieper;
+    sendIRMessageControl & IR;
     killedBy kills[9] = {1,2,3,4,5,6,7,8,9};
 
     int playerID;
@@ -79,7 +82,7 @@ private:
                     }
                 }
                 case SHOOT: {
-                    """sendIRMessageControl::sendMessage(playerID, weaponPower);"""
+                    IR.sendMessage(playerID, weaponPower);
                     state = RELOAD;
                     break;
                 }
@@ -90,19 +93,19 @@ private:
                     break;
                 }
                 case HIT: {
+                    bieper.playHitSound();
                     health = health - (parametersPool.read() * 17);
                     if(health <= 0){
                         state = DEAD;
                         break;
                     }
-                    """Play hit sound"""
                 }
                 case DEAD: {
                     revivalTimer.set(10);
                     int ID = parametersPool.read();
                     kills[ID-1].playerID = ID;
                     kills[ID-1].amount++;
-                    """Play death sound"""
+                    bieper.playDeathSound();
                     wait(revivalTimer);
                     health = 100;
                     state = NORMAAL;
@@ -113,7 +116,7 @@ private:
     }
 
 public:
-    runGameControl():
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR):
             rtos::task<>("RunGameTask"),
             countdownTimer(this, "countdownTimer"),
             revivalTimer(this, "revivalTimer"),
@@ -122,7 +125,9 @@ public:
             parametersPool("parametersPool"),
             buttonChannel(this, "buttonID"),
             parametersFlag(this, "parametersFlag"),
-            hitFlag(this, "hitFlag")
+            hitFlag(this, "hitFlag"),
+            bieper(bieper),
+            IR(IR)
     {}
 
     void setParams(int playerID, int weaponPower, int playtime){

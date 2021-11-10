@@ -17,10 +17,11 @@ private:
     hwlib::target::pin_in minKnop  = hwlib::target::pin_in( hwlib::target::pins::d48 );
     hwlib::target::pin_in menuKnop  = hwlib::target::pin_in( hwlib::target::pins::d46 );
     hwlib::target::pin_in confirmKnop  = hwlib::target::pin_in( hwlib::target::pins::d44 );
+    hwlib::target::pin_in trigger  = hwlib::target::pin_in( hwlib::target::pins::d42 );
 
     initGameControl & initGame;
     display & scherm;
-    runGameControl runGame;
+    runGameControl & runGame;
 
     void main() {
         for (;;) {
@@ -47,14 +48,12 @@ private:
             if (!trigger.read()) {
                 initGame.buttonPressed(5);
                 runGame.buttonPressed(5);
-
             }
         }
     }
 
 public:
-
-    ButtonListener(initGameControl & initGame, display & scherm  , runGameControl runGame): rtos::task<>("buttonListenerTask"), initGame(initGame), scherm(scherm) , runGame(runGame){}
+    ButtonListener(initGameControl & initGame, display & scherm, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame), scherm(scherm) , runGame(runGame){}
 };
 
 
