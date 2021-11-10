@@ -73,7 +73,7 @@ private:
     }
 
 public:
-    receiveIRMessageControl(gameParametersControl & parameters) : rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
+    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
 
 
 //    bool checkSum(uint16_t message) {
