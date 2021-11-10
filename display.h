@@ -12,7 +12,7 @@
 class display : public rtos::task<>{
 private:
 
-    rtos::channel<buttonID, 5> buttonPressedChannel;
+    rtos::channel<int, 5> buttonPressedChannel;
 
     int gameState = 0;
 
@@ -53,23 +53,22 @@ private:
     hwlib::terminal_from d5 = hwlib::terminal_from( w5, f3 );
     hwlib::terminal_from d6 = hwlib::terminal_from( w6, f3 );
 
-    int time = 5;
-    int power = 1;
-
 
     void main() {
 
+        auto evt = wait(buttonPressedChannel);
 
         switch (gameState) {
             case PRE_GAME:
                 // als hij net aan gaat dan kan hij hier wat extra gegevens dan wel opvragen dan checken.
                 d1 << "\f"
                    << "press \n any \n button";
-                if (buttonPressedChannel.read() != 0) {
-                    showChange();
-                    gameState = SETTIMING;
+                if(evt == buttonPressedChannel) {
+                    if (buttonPressedChannel.read() != 0) {
+                        showChange();
+                        gameState = SETTIMING;
+                    }
                 }
-
             case SETTIMING:
                 // Momenteel enkel voor het 'opgeven' van de tijd in de int time. Deze zal in gameParameter verder moeten worden verwerkt;
                 d4 << "\f"
@@ -78,21 +77,18 @@ private:
                    << "minuten";
                 d6 << "\f"
                    << "     -  " << time << "  +";
-                if (buttonPressedChannel.read() == 1) {
-                    // timing wordt toegevoegd in initGameControl
-                    showChange();
-                }
-                if (buttonPressedChannel.read() == 2) {
-                    //zie bovenstaande comment
-                    showChange();
-                }
-                if (buttonPressedChannel.read() = 4) {
-                    d1 << "\f"
-                       << "u sure?";
-                    if (buttonPressedChannel.read() = 4) {
+                if(evt == buttonPressedChannel) {
+                    if (buttonPressedChannel.read() == 1) {
+                        // timing wordt toegevoegd in initGameControl
+                        showChange();
+                    }
+                    if (buttonPressedChannel.read() == 2) {
+                        //zie bovenstaande comment
+                        showChange();
+                    }
+                    if (buttonPressedChannel.read() == 4) {
                         gameState = SETWEAPONPOWER;
-                    } else if (buttonPressedChannel.read() = 3) {
-                        gameState = SETTIMING;
+
                     }
                 }
 
@@ -105,17 +101,19 @@ private:
                 d6 << "\f"
                    << "     -  " << power << "  +";
 
-                if (buttonPressedChannel.read() == 1) {
-                    power++;
-                    showChange();
-                }
-                if (buttonPressedChannel.read() == 2) {
-                    power++;
-                    showChange();
-                }
-                if (buttonPressedChannel.read() = 4) {
-                    gameState = GAME;
+                if(evt == buttonPressedChannel){
+                    if (buttonPressedChannel.read() == 1) {
+                        power++;
+                        showChange();
+                    }
+                    if (buttonPressedChannel.read() == 2) {
+                        power++;
+                        showChange();
+                    }
+                    if (buttonPressedChannel.read() == 4) {
+                      gameState = GAME;
 
+                    }
                 }
 
             case GAME:
@@ -128,8 +126,17 @@ private:
     }
 
 public:
+    int time = 5;
+    int power = 1;
 
     display(): rtos::task<>("schermTaak"){}
+
+    void showConfirm(){
+        d4 << "druk aub op de";
+        d5 << "confirm knop";
+        d6 << "\f";
+    }
+
 
     void showChange(){
         oled.flush();
@@ -161,7 +168,7 @@ public:
 
 
 
-}
+};
 
 
 #endif //V2THDE_EXAMPLES_DISPLAY_H
