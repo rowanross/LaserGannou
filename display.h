@@ -12,7 +12,7 @@
 class display : public rtos::task<>{
 private:
 
-    rtos::channel<int, 5> buttonPressedChannel;
+    rtos::channel<int, 5> buttonPressedChannel = rtos::channel<int, 5>(nullptr);
 
     int gameState = 0;
 
@@ -129,12 +129,12 @@ public:
     int time = 5;
     int power = 1;
 
-    display(): rtos::task<>("schermTaak"){}
+    display(): rtos::task<>("schermTaak") {}
 
     void showConfirm(){
         d4 << "druk aub op de";
-        d5 << "confirm knop,";
-        d6 << "if(connected met pc)";
+        d5 << "confirm knop";
+        d6 << "\f";
     }
 
 
