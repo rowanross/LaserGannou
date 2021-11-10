@@ -22,6 +22,7 @@ private:
     rtos::pool<unsigned long int> countdownPool;
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
+    rtos::flag transferFlag;
     rtos::timer countdownTimer;
     rtos::timer revivalTimer;
     rtos::timer reloadTimer;
@@ -76,6 +77,7 @@ private:
                         scherm.ShowTiming(playtime);
                         if(playtime == 0){
                             """Stop game, display press accept to transfer deaths"""
+                            state = TRANSFER;
                             break;
                         }
                     }
@@ -113,15 +115,19 @@ private:
                     break;
                 }
                 case TRANSFER: {
-
-
+                    auto evt = wait(transferFlag);
+                    if(evt == transferFlag){
+                        scherm.clearDisplay();
+                        state = IDLE;
+                        break;
+                    }
                 }
             }
         }
     }
 
 public:
-    runGameControl(bieperControl & bieper, sendIRMessageControl & IR):
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm):
             rtos::task<>("RunGameTask"),
             countdownTimer(this, "countdownTimer"),
             revivalTimer(this, "revivalTimer"),
@@ -131,9 +137,11 @@ public:
             buttonChannel(this, "buttonID"),
             parametersFlag(this, "parametersFlag"),
             hitFlag(this, "hitFlag"),
-            transferHit(this, "transferFlag")
+            transferFlag(this, "transferFlag"),
             bieper(bieper),
-            IR(IR)
+            IR(IR),
+            scherm(scherm)
+            {}
 
     void setParams(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
@@ -150,6 +158,10 @@ public:
         parametersPool.write(weaponpower);
         parametersPool.write(playerID);
         hitFlag.set();
+    }
+
+    void dataTransferred(){
+        transferFlag.set();
     }
 
 };
