@@ -1,7 +1,8 @@
 #ifndef TRANSFERHITCONTROL_HPP
 #define TRANSFERHITCONTROL_HPP
+
 #include "runGameControl.h"
-#include <array>
+
 class transferHit : public rtos::task<>{
 public:
     transferHit();

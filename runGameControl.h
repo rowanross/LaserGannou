@@ -3,7 +3,7 @@
 
 #include "hwlib.hpp"
 #include "rtos.hpp"
-#include "receiveIRMessageControl.h"
+//#include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
 #include "transferHitControl.hpp"
 #include "bieperControl.h"
@@ -14,7 +14,6 @@ struct killedBy {
     unsigned int amount = 0;
 };
 
-
 class runGameControl : public rtos::task <>{
 private:
     enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
@@ -22,7 +21,6 @@ private:
     rtos::pool <int> parametersPool;
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
-    rtos::flag transferFlag;
     rtos::timer countdownTimer;
     rtos::timer revivalTimer;
     rtos::timer reloadTimer;
@@ -31,7 +29,9 @@ private:
     bieperControl & bieper;
     sendIRMessageControl & IR;
     display & scherm;
-    killedBy kills[9] = {1,2,3,4,5,6,7,8,9};
+    transferHit & transfer;
+    killedBy player_1, player_2, player_3, player_4, player_5, player_6, player_7, player_8, player_9;
+    killedBy kills[9] = {player_1,player_2,player_3,player_4,player_5,player_6,player_7,player_8,player_9};
 
     int playerID;
     int playtime;
@@ -67,8 +67,8 @@ private:
 
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 5){
-                                state = SHOOT;
-                                break;
+                            state = SHOOT;
+                            break;
                         }
                     }
 
@@ -76,7 +76,7 @@ private:
                         playtime--;
                         scherm.ShowTiming(playtime);
                         if(playtime == 0){
-                            """Stop game, display press accept to transfer deaths"""
+                            """display press accept to transfer deaths"""
                             state = TRANSFER;
                             break;
                         }
@@ -115,16 +115,13 @@ private:
                     break;
                 }
                 case TRANSFER: {
-                    auto evt = wait(transferFlag);
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 4){
-
+                            transfer.transferData(kills)
+                            scherm.clearDisplay();
+                            state = IDLE;
+                            break;
                         }
-                    }
-                    if(evt == transferFlag){
-                        scherm.clearDisplay();
-                        state = IDLE;
-                        break;
                     }
                 }
             }
@@ -132,7 +129,7 @@ private:
     }
 
 public:
-    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm):
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
             rtos::task<>("RunGameTask"),
             countdownTimer(this, "countdownTimer"),
             revivalTimer(this, "revivalTimer"),
@@ -142,11 +139,11 @@ public:
             buttonChannel(this, "buttonID"),
             parametersFlag(this, "parametersFlag"),
             hitFlag(this, "hitFlag"),
-            transferFlag(this, "transferFlag"),
             bieper(bieper),
             IR(IR),
-            scherm(scherm)
-            {}
+            scherm(scherm),
+            transfer(transfer)
+    {}
 
     void setParams(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
@@ -163,10 +160,6 @@ public:
         parametersPool.write(weaponpower);
         parametersPool.write(playerID);
         hitFlag.set();
-    }
-
-    void dataTransferred(){
-        transferFlag.set();
     }
 
 };
