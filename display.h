@@ -55,74 +55,7 @@ private:
 
 
     void main() {
-
-        auto evt = wait(buttonPressedChannel);
-
-        switch (gameState) {
-            case PRE_GAME:
-                // als hij net aan gaat dan kan hij hier wat extra gegevens dan wel opvragen dan checken.
-                d1 << "\f"
-                   << "press \n any \n button";
-                if(evt == buttonPressedChannel) {
-                    if (buttonPressedChannel.read() != 0) {
-                        showChange();
-                        gameState = SETTIMING;
-                    }
-                }
-            case SETTIMING:
-                // Momenteel enkel voor het 'opgeven' van de tijd in de int time. Deze zal in gameParameter verder moeten worden verwerkt;
-                d4 << "\f"
-                   << "    Geef uw \n  timing:";
-                d5 << "\f"
-                   << "minuten";
-                d6 << "\f"
-                   << "     -  " << time << "  +";
-                if(evt == buttonPressedChannel) {
-                    if (buttonPressedChannel.read() == 1) {
-                        // timing wordt toegevoegd in initGameControl
-                        showChange();
-                    }
-                    if (buttonPressedChannel.read() == 2) {
-                        //zie bovenstaande comment
-                        showChange();
-                    }
-                    if (buttonPressedChannel.read() == 4) {
-                        gameState = SETWEAPONPOWER;
-
-                    }
-                }
-
-
-            case SETWEAPONPOWER:
-                d4 << "\f"
-                   << "    Geef uw \n  weaponpower:";
-                d5 << "\f"
-                   << "WeaponPower";
-                d6 << "\f"
-                   << "     -  " << power << "  +";
-
-                if(evt == buttonPressedChannel){
-                    if (buttonPressedChannel.read() == 1) {
-                        power++;
-                        showChange();
-                    }
-                    if (buttonPressedChannel.read() == 2) {
-                        power++;
-                        showChange();
-                    }
-                    if (buttonPressedChannel.read() == 4) {
-                      gameState = GAME;
-
-                    }
-                }
-
-            case GAME:
-                oled.flush();
-                // show time
-                //runGameControl timer ophalen.
-
-                break;
-        }
+        //idk abstracte klasse. dit vind het nodig
     }
 
 public:
@@ -133,6 +66,42 @@ public:
         rtos::task<>("schermTaak"),
         buttonPressedChannel(this, "buttonID")
     {}
+
+    void preGame(){
+        oled.clear();
+        d1 << "\f"
+           << "press \n any \n button";
+        oled.flush();
+    }
+
+    void setTiming(){
+        oled.clear();
+        d4 << "\f"
+           << "    Geef uw \n  timing:";
+        d5 << "\f"
+           << "minuten";
+        d6 << "\f"
+           << "     -  " << time << "  +";
+        oled.flush();
+    }
+
+    void setWeaponPower(){
+        oled.clear();
+        d4 << "\f"
+           << "    Geef uw \n  weaponpower:";
+        d5 << "\f"
+           << "WeaponPower";
+        d6 << "\f"
+           << "     -  " << power << "  +";
+        oled.flush();
+    }
+
+    void RunGame(){
+        oled.flush();
+        //timer komt nog uit runGameControl
+    }
+
+
 
     void showConfirm(){
         d4 << "druk aub op de";
