@@ -14,7 +14,7 @@ struct killedBy {
 
 class runGameControl : public rtos::task <>{
 private:
-    enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD};
+    enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
     state_t  state = IDLE;
     rtos::pool <int> parametersPool;
     rtos::pool<unsigned long int> countdownPool;
@@ -108,6 +108,10 @@ private:
                     state = NORMAAL;
                     break;
                 }
+                case TRANSFER: {
+
+
+                }
             }
         }
     }
@@ -122,7 +126,8 @@ public:
             parametersPool("parametersPool"),
             buttonChannel(this, "buttonID"),
             parametersFlag(this, "parametersFlag"),
-            hitFlag(this, "hitFlag")
+            hitFlag(this, "hitFlag"),
+            transferHit(this, "transferFlag")
     {}
 
     void setParams(int playerID, int weaponPower, int playtime){
