@@ -76,7 +76,7 @@ public:
     initGameControl(sendIRMessageControl & sendIRMessage, display & scherm):
         rtos::task<>("initGameControlTaak"),
         buttonChannel(this, "buttonID"),
-        sendIRMessage(sendIRMessage), 
+        sendIRMessage(sendIRMessage),
         scherm(scherm)
     {}
 

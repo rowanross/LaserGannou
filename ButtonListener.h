@@ -5,6 +5,7 @@
 #include "rtos.hpp"
 #include "initGameControl.h"
 #include "runGameControl.h"
+#include "gameParametersControl.h"
 
 #ifndef V2THDE_EXAMPLES_BUTTONLISTENER_H
 #define V2THDE_EXAMPLES_BUTTONLISTENER_H
@@ -21,28 +22,34 @@ private:
     initGameControl & initGame;
     display & scherm;
     runGameControl & runGame;
+    gameParametersControl & gameParam;
 
     void main() {
         for (;;) {
             if (!plusKnop.read()) {
                 initGame.buttonPressed(1);
                 runGame.buttonPressed(1);
+                gameParam.buttonPressed(1);
             }
             if (!minKnop.read()) {
                 initGame.buttonPressed(2);
                 runGame.buttonPressed(2);
+                gameParam.buttonPressed(2);
             }
             if (!menuKnop.read()) {
                 initGame.buttonPressed(3);
                 runGame.buttonPressed(3);
+                gameParam.buttonPressed(3);
             }
             if (!confirmKnop.read()) {
                 initGame.buttonPressed(4);
                 runGame.buttonPressed(4);
+                gameParam.buttonPressed(4);
             }
             if (!trigger.read()) {
                 initGame.buttonPressed(5);
                 runGame.buttonPressed(5);
+                gameParam.buttonPressed(5);
             }
         }
     }

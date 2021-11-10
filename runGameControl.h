@@ -18,7 +18,7 @@
 class runGameControl : public rtos::task <>{
 private:
     enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
-    state_t  state = IDLE;
+    state_t state = IDLE;
     rtos::pool <int> parametersPool;
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
@@ -116,6 +116,7 @@ private:
                     break;
                 }
                 case TRANSFER: {
+                    auto evt = wait(buttonChannel);
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 4){
                             transfer.transferData(kills);
@@ -132,21 +133,21 @@ private:
 public:
     runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
             rtos::task<>("RunGameTask"),
+            parametersPool("parametersPool"),
+            hitFlag(this, "hitFlag"),
+            parametersFlag(this, "parametersFlag"),
             countdownTimer(this, "countdownTimer"),
             revivalTimer(this, "revivalTimer"),
             reloadTimer(this, "reloadTimer"),
             gameClock(this, 1, "gameClock"),
-            parametersPool("parametersPool"),
             buttonChannel(this, "buttonID"),
-            parametersFlag(this, "parametersFlag"),
-            hitFlag(this, "hitFlag"),
             bieper(bieper),
             IR(IR),
             scherm(scherm),
             transfer(transfer)
     {}
 
-    void setParams(int playerID, int weaponPower, int playtime){
+    void setParameters(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
         parametersPool.write(weaponPower);
         parametersPool.write(playtime);

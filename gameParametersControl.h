@@ -4,79 +4,78 @@
 #include "hwlib.hpp"
 #include "rtos.hpp"
 #include "runGameControl.h"
+#include "display.h"
 
 class gameParametersControl : public rtos::task <>{
 private:
-    hwlib::target::pin_in min = hwlib::target::pin_in(hwlib::target::pins::d8);
-    hwlib::target::pin_in plus = hwlib::target::pin_in(hwlib::target::pins::d9);
-    hwlib::target::pin_in confirm = hwlib::target::pin_in(hwlib::target::pins::d10);
-
-    hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
-    hwlib::target::pin_oc sda = hwlib::target::pin_oc( hwlib::target::pins::sda );
-    hwlib::i2c_bus_bit_banged_scl_sda i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda( scl, sda );
-    hwlib::glcd_oled oled = hwlib::glcd_oled( i2c_bus, 0x3c );
-
-    static constexpr int SYSTEMSTARTUP = 1;
-    static constexpr int GETPARAMETERS = 2;
-    static constexpr int STARTGAME= 3;
-
-    rtos::flag Startflag;
+    enum state_t {IDLE, WEAPONPOWER, STARTGAME};
+    state_t state = IDLE;
+    rtos::flag startFlag;
+    rtos::channel<int, 5> buttonChannel;
 
     uint16_t playtime = 0;
     uint16_t playerID = 0;
-    uint16_t weaponPower = 0;
+    int weaponPower = 0;
 
     runGameControl & runGame;
+    display & scherm;
 
-    rtos::channel<buttonID, 5> buttonPressedChannel;
+    rtos::channel<int, 5> buttonPressedChannel;
     rtos::flag parametersFlag;
 
     void main(){
-        int state = GETPARAMETERS;
-        switch(state) {
-            case GETPARAMETERS:{
-                auto w2 = hwlib::part(
-                        oled,
-                        hwlib::xy( 0, 32 ),
-                        hwlib::xy( 128, 48));
-                auto f1 = hwlib::font_default_8x8();
-                auto d2 = hwlib::terminal_from( w2, f1 );
-                int power = 1;
-                for(;;){
-                    if(power > 1){
-                        if(min.read() == 0){
-                            power--;
-                            d2 << "\f"
-                               << "     -  " << power << "  +" << hwlib::flush;
-                        }
+        for(;;){
+            switch(state) {
+                case IDLE: {
+                    auto evt = wait(startFlag);
+                    if(evt == startFlag){
+                        state = WEAPONPOWER;
                     }
-                    if(power < 3){
-                        if(plus.read() == 0){
-                            power++;
-                            d2 << "\f"
-                               << "     -  " << power << "  +" << hwlib::flush;
+                    break;
+                }
+                case WEAPONPOWER: {
+                    auto evt = wait(buttonChannel);
+                    weaponPower = 1;
+                    scherm.setWeaponPower(weaponPower);
+                    if(evt == buttonChannel){
+                        if(weaponPower> 1){
+                            if(buttonChannel.read() == 2){
+                                weaponPower--;
+                                scherm.setWeaponPower(weaponPower);
+                            }
                         }
-                    }
-                    if(confirm.read() == 0){
-                        break;
+                        if(weaponPower < 3){
+                            if(buttonChannel.read() == 1){
+                                weaponPower++;
+                                scherm.setWeaponPower(weaponPower);
+                            }
+                        }
+                        if(buttonChannel.read() == 4){
+                            scherm.clearDisplay();
+                            state = STARTGAME;
+                            break;
+                        }
                     }
                 }
-            }
-
-            case STARTGAME:{
-                runGame.setParameters();
+                case STARTGAME:{
+                    runGame.setParameters(playerID, weaponPower, playtime);
+                    state = IDLE;
+                    break;
+                }
             }
         }
     }
 
 public:
-    gameParametersControl(runGameControl & runGame):
-            rtos::task<>("parametersControlTaak"),
+    gameParametersControl(runGameControl & runGame, display & scherm):
+            rtos::task<>("parametersControlTask"),
+            startFlag(this, "startFlag"),
+            buttonChannel(this, "buttonID"),
             runGame(runGame),
-            Startflag(this, "Startflag")
+            scherm(scherm)
     {}
 
-    void setParams(uint16_t playerID_r, uint16_t playtime_r){
+    void setParams(uint16_t & playerID_r, uint16_t & playtime_r){
         playerID = playerID_r;
         playtime = playtime_r;
     }
@@ -85,7 +84,7 @@ public:
         buttonPressedChannel.write(buttonID);
     }
 
-    void Start(){Startflag.set();}
+    void Start(){startFlag.set();}
 };
 
 

@@ -49,8 +49,6 @@ private:
     }
 
 public:
-    int time = 5;
-    int power = 1;
 
     display():
         rtos::task<>("schermTaak")
@@ -63,7 +61,7 @@ public:
         oled.flush();
     }
 
-    void setTiming(){
+    void setTiming(int & time){
         oled.clear();
         d4 << "\f"
            << "    Geef uw \n  timing:";
@@ -74,7 +72,7 @@ public:
         oled.flush();
     }
 
-    void setWeaponPower(){
+    void setWeaponPower(int & power){
         oled.clear();
         d4 << "\f"
            << "    Geef uw \n  weaponpower:";
