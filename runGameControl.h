@@ -8,7 +8,7 @@
 
 struct killedBy {
     unsigned int playerID;
-    unsigned int amount;
+    unsigned int amount = 0;
 };
 
 
@@ -21,15 +21,16 @@ private:
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
     rtos::timer countdownTimer;
+    rtos::timer revivalTimer;
+    rtos::timer reloadTimer;
     rtos::clock gameClock;
     rtos::channel<int, 5> buttonChannel;
-    killedBy kills[8];
+    killedBy kills[9] = {1,2,3,4,5,6,7,8,9};
 
     int playerID;
     int playtime;
     int health = 100;
     int weaponPower;
-    int cooldown = 0;
     unsigned long int countdown = 10;
 
     void main(){
@@ -49,8 +50,15 @@ private:
                     countdownTimer.set(countdown);
                     wait(countdownTimer);
                     state = NORMAAL;
+                    break;
                 }
                 case NORMAAL: {
+                    auto evt = wait(hitFlag+buttonChannel+gameClock);
+                    if(evt == hitFlag){
+                        state = HIT;
+                        break;
+                    }
+
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 5){
                             if(cooldown <= 0){
@@ -71,7 +79,34 @@ private:
                     }
                 }
                 case SHOOT: {
-
+                    """sendIRMessageControl::sendMessage(playerID, weaponPower);"""
+                    state = RELOAD;
+                    break;
+                }
+                case RELOAD: {
+                    reloadTimer.set(weaponPower);
+                    wait(reloadTimer);
+                    state = NORMAAL;
+                    break;
+                }
+                case HIT: {
+                    health = health - (parametersPool.read() * 17);
+                    if(health <= 0){
+                        state = DEAD;
+                        break;
+                    }
+                    """Play hit sound"""
+                }
+                case DEAD: {
+                    revivalTimer.set(10);
+                    int ID = parametersPool.read();
+                    kills[ID-1].playerID = ID;
+                    kills[ID-1].amount++;
+                    """Play death sound"""
+                    wait(revivalTimer);
+                    health = 100;
+                    state = NORMAAL;
+                    break;
                 }
             }
         }
@@ -81,6 +116,8 @@ public:
     runGameControl():
             rtos::task<>("RunGameTask"),
             countdownTimer(this, "countdownTimer"),
+            revivalTimer(this, "revivalTimer"),
+            reloadTimer(this, "reloadTimer"),
             gameClock(this, 1, "gameClock"),
             parametersPool("parametersPool"),
             buttonChannel(this, "buttonID"),
@@ -100,8 +137,8 @@ public:
     }
 
     void hitBy(int playerID, int weaponpower){
-        parametersPool.write(playerID);
         parametersPool.write(weaponpower);
+        parametersPool.write(playerID);
         hitFlag.set();
     }
 
