@@ -8,11 +8,12 @@
 #include "transferHitControl.hpp"
 #include "bieperControl.h"
 #include "display.h"
+#include "struct.h"
 
-struct killedBy {
-    unsigned int playerCode = 0;
-    unsigned int amount = 0;
-};
+//struct killedBy {
+//    unsigned int playerCode = 0;
+//    unsigned int amount = 0;
+//};
 
 class runGameControl : public rtos::task <>{
 private:
@@ -117,7 +118,7 @@ private:
                 case TRANSFER: {
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 4){
-                            transfer.transferData(kills)
+                            transfer.transferData(kills);
                             scherm.clearDisplay();
                             state = IDLE;
                             break;

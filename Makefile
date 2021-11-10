@@ -25,6 +25,7 @@ HEADERS += rtttl_player.hpp
 HEADERS += runGameControl.h
 HEADERS += sendIRMessageControl.h
 HEADERS += transferHitControl.hpp
+HEADERS += struct.h
 
 # other places to look for files for this project
 SEARCH  := 
