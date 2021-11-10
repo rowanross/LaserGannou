@@ -5,6 +5,8 @@
 #include "rtos.hpp"
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
+#include "bieperControl.h"
+#include "display.h"
 
 struct killedBy {
     unsigned int playerID;
@@ -14,17 +16,21 @@ struct killedBy {
 
 class runGameControl : public rtos::task <>{
 private:
-    enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD};
+    enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
     state_t  state = IDLE;
     rtos::pool <int> parametersPool;
     rtos::pool<unsigned long int> countdownPool;
     rtos::flag hitFlag;
     rtos::flag parametersFlag;
+    rtos::flag transferFlag;
     rtos::timer countdownTimer;
     rtos::timer revivalTimer;
     rtos::timer reloadTimer;
     rtos::clock gameClock;
     rtos::channel<int, 5> buttonChannel;
+    bieperControl & bieper;
+    sendIRMessageControl & IR;
+    display & scherm;
     killedBy kills[9] = {1,2,3,4,5,6,7,8,9};
 
     int playerID;
@@ -61,25 +67,23 @@ private:
 
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 5){
-                            if(cooldown <= 0){
                                 state = SHOOT;
                                 break;
-                            }
                         }
                     }
 
                     if(evt == gameClock){
-                        cooldown--;
                         playtime--;
+                        scherm.ShowTiming(playtime);
                         if(playtime == 0){
                             """Stop game, display press accept to transfer deaths"""
+                            state = TRANSFER;
                             break;
                         }
-                        """display.showChange(gameTime);"""
                     }
                 }
                 case SHOOT: {
-                    """sendIRMessageControl::sendMessage(playerID, weaponPower);"""
+                    IR.sendMessage(playerID, weaponPower);
                     state = RELOAD;
                     break;
                 }
@@ -90,30 +94,40 @@ private:
                     break;
                 }
                 case HIT: {
+                    bieper.playHitSound();
                     health = health - (parametersPool.read() * 17);
                     if(health <= 0){
                         state = DEAD;
                         break;
                     }
-                    """Play hit sound"""
+                    state = NORMAAL;
+                    break;
                 }
                 case DEAD: {
                     revivalTimer.set(10);
                     int ID = parametersPool.read();
                     kills[ID-1].playerID = ID;
                     kills[ID-1].amount++;
-                    """Play death sound"""
+                    bieper.playDeathSound();
                     wait(revivalTimer);
                     health = 100;
                     state = NORMAAL;
                     break;
+                }
+                case TRANSFER: {
+                    auto evt = wait(transferFlag);
+                    if(evt == transferFlag){
+                        scherm.clearDisplay();
+                        state = IDLE;
+                        break;
+                    }
                 }
             }
         }
     }
 
 public:
-    runGameControl():
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm):
             rtos::task<>("RunGameTask"),
             countdownTimer(this, "countdownTimer"),
             revivalTimer(this, "revivalTimer"),
@@ -122,8 +136,12 @@ public:
             parametersPool("parametersPool"),
             buttonChannel(this, "buttonID"),
             parametersFlag(this, "parametersFlag"),
-            hitFlag(this, "hitFlag")
-    {}
+            hitFlag(this, "hitFlag"),
+            transferFlag(this, "transferFlag"),
+            bieper(bieper),
+            IR(IR),
+            scherm(scherm)
+            {}
 
     void setParams(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
@@ -140,6 +158,10 @@ public:
         parametersPool.write(weaponpower);
         parametersPool.write(playerID);
         hitFlag.set();
+    }
+
+    void dataTransferred(){
+        transferFlag.set();
     }
 
 };
