@@ -3,9 +3,8 @@
 //
 #include "hwlib.hpp"
 #include "rtos.hpp"
-//#include "display"
+#include "display.h"
 #include "sendIRMessageControl.h"
-#include "gameParametersControl.h"
 
 
 #ifndef V2THDE_EXAMPLES_INITGAMECONTROL_H
@@ -18,62 +17,58 @@ private:
     static constexpr int KIESTIMING = 2;
     static constexpr int SENDSTARTSIGNAL= 3;
 
-    uint16_t message = 0;
-    uint16_t playtime = 5;
-    uint16_t playerID = 0;
-    uint16_t weaponPower = 0;
+    rtos::event evt = wait(buttonPressedChannel);
 
     sendIRMessageControl & sendIRMessage;
+    display & scherm;
 
-    gameParametersControl & parameters;
-
-    rtos::channel<buttonID, 5> buttonChannel;
+    rtos::channel<int, 5> buttonPressedChannel = rtos::channel<int, 5>(nullptr);
 
     void main(){
         namespace target = hwlib::target;
         int status = SYSTEMSTARTUP;
 
-        switch (status){
+        switch (status) {
             case SYSTEMSTARTUP:
-                display.showChange();
-                auto evt = wait(buttonChannel);
-                if(evt == buttonChannel){
-                    if (buttonChannel.read() != 0) {
+                scherm.showChange();
+                if (evt == buttonPressedChannel) {
+                    if (buttonPressedChannel.read() != 0) {
                         status = KIESTIMING;
                     }
                 }
             case KIESTIMING:
-                display.showChange();
-                if(buttonChannel.read() == 1){
-                    playtime++;
-                    display.showChange();
-                }else if(buttonChannel.read() == 2){
-                    display.showChange();
-                    playtime--;
-                }
-                if(buttonChannel.read() == 4){
-                    status = SENDSTARTSIGNAL;
-                }
-            case SENDSTARTSIGNAL:
-                for(;;){
-                    playerID++;
-                    message = (((((1 << 4) | playerID) << 2 | weaponpower) << 5) | playtime) << 4;
-                    sendIRMessage.sendMessage(message); //stuur start signaal
-                    if (buttonChannel.read() = 4){
-                        gameParametersControl.setParams(0x00, playtime);
-                        break;
+                scherm.showChange();
+                scherm.time = 5; // zet timer op 5 min standaard;
+                if (evt == buttonPressedChannel) {
+                    if (buttonPressedChannel.read() == 1) {
+                        scherm.time += 1;
+                        scherm.showChange();
+                    }
+                    if (buttonPressedChannel.read() == 2) {
+                        scherm.time -= 1;
+                        scherm.showChange();
                     }
                 }
+
+                if(evt == buttonPressedChannel && buttonPressedChannel.read() == 4){
+                    timer = scherm.time;
+                    scherm.showChange();
+                    status = SENDSTARTSIGNAL;
+                }
+
+                case SENDSTARTSIGNAL:
+                sendIRMessage.sendStartSignal(); //stuur start signaal;
+                // stuur timer en start zelf timer
         }
     }
 
 public:
-    initGameControl(sendIRMessageControl & sendIRMessage) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage){
+    int timer = 0;
 
-    };
+    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage), scherm(scherm){};
 
     void buttonPressed(int buttonID){
-        buttonChannel.write(buttonID);
+        buttonPressedChannel.write(buttonID);
     }
 };
 
