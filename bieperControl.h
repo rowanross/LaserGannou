@@ -16,8 +16,8 @@
 class bieperControl : public rtos::task<>{
 private:
     //stuur de bieper aan
-    static constexpr char hitSound[] = "SOS:d=4,o=5,b=60:a,p,a,p,a,p,2a.,p,2a.,p,2a.,p,a,p,a,p,a";       // te veranderen!
-    static constexpr char deathSound[] = "dood:d=4,o=5,b=40:16g6,16e6,16g,2p";                          // idk van kyrill gekregen
+    static constexpr char hitSound[] = "hit:d=4,o=5,b=500:a,16p,a";       // gr kyrill
+    static constexpr char deathSound[] = "dood:d=4,o=5,b=40:16g6,16e6,16g";     // gr kyrill
 
     //zet de juiste pin neer;
     hwlib::target::pin_out lsp = hwlib::target::pin_out( hwlib::target::pins::d7 );
