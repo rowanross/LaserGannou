@@ -22,7 +22,7 @@ private:
     uint16_t playerID = 0;
     uint16_t weaponPower = 0;
     gameParametersControl & parameters;
-    rtos::channel<int, 5> buttonChannel = rtos::channel<int, 5>(nullptr);
+    rtos::channel<int, 5> buttonChannel;
 
     sendIRMessageControl & sendIRMessage;
     display & scherm;
@@ -73,7 +73,12 @@ private:
 
 
 public:
-    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm) : rtos::task<>("initGameControlTaak"), sendIRMessage(sendIRMessage), scherm(scherm){};
+    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm):
+        rtos::task<>("initGameControlTaak"),
+        buttonChannel(this, "buttonID"),
+        sendIRMessage(sendIRMessage), 
+        scherm(scherm)
+    {}
 
     void buttonPressed(int buttonID){
         buttonPressedChannel.write(buttonID);
