@@ -6,6 +6,7 @@
 #include "receiveIRMessageControl.h"
 #include "sendIRMessageControl.h"
 #include "bieperControl.h"
+#include "display.h"
 
 struct killedBy {
     unsigned int playerID;
@@ -28,6 +29,7 @@ private:
     rtos::channel<int, 5> buttonChannel;
     bieperControl & bieper;
     sendIRMessageControl & IR;
+    display & scherm;
     killedBy kills[9] = {1,2,3,4,5,6,7,8,9};
 
     int playerID;
@@ -64,21 +66,18 @@ private:
 
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 5){
-                            if(cooldown <= 0){
                                 state = SHOOT;
                                 break;
-                            }
                         }
                     }
 
                     if(evt == gameClock){
-                        cooldown--;
                         playtime--;
+                        scherm.ShowTiming(playtime);
                         if(playtime == 0){
                             """Stop game, display press accept to transfer deaths"""
                             break;
                         }
-                        """display.showChange(gameTime);"""
                     }
                 }
                 case SHOOT: {
@@ -99,6 +98,8 @@ private:
                         state = DEAD;
                         break;
                     }
+                    state = NORMAAL;
+                    break;
                 }
                 case DEAD: {
                     revivalTimer.set(10);
