@@ -4,6 +4,7 @@
 #include "hwlib.hpp"
 #include "rtos.hpp"
 #include "runGameControl.h"
+#include "bieperControl.h"
 #include "display.h"
 
 class gameParametersControl : public rtos::task <>{

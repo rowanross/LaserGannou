@@ -16,12 +16,14 @@ private:
     static constexpr int SYSTEMSTARTUP = 1;
     static constexpr int KIESTIMING = 2;
     static constexpr int SENDSTARTSIGNAL= 3;
+    static constexpr int IDLE = 4;
 
     uint16_t message = 0;
     uint16_t playtime = 5;
     uint16_t playerID = 0;
     uint16_t weaponPower = 0;
     gameParametersControl & parameters;
+    rtos::flag startFlag;
     rtos::channel<int, 5> buttonChannel;
 
     sendIRMessageControl & sendIRMessage;
@@ -29,44 +31,64 @@ private:
 
 
     void main(){
-        namespace target = hwlib::target;
-        int status = SYSTEMSTARTUP;
+        start();
+        int status = IDLE;
 
         switch (status) {
-            case SYSTEMSTARTUP:
-                scherm.showChange();
-                auto evt = wait(buttonChannel);
-                if (evt == buttonChannel) {
-                    if (buttonChannel.read() != 0) {
-                        status = KIESTIMING;
-                    }
-                }
-
-
-            case KIESTIMING:
-                scherm.showChange();
-                if (buttonChannel.read() == 1) {
-                    playtime++;
-                    scherm.showChange();
-                } else if (buttonChannel.read() == 2) {
-                    scherm.showChange();
-                    playtime--;
-                }
-                if (buttonChannel.read() == 4) {
-                    status = SENDSTARTSIGNAL;
-                }
-
-
-            case SENDSTARTSIGNAL:
-                for (;;) {
-                    playerID++;
-                    message = (((((1 << 4) | playerID) << 2 | weaponPower) << 5) | playtime) << 4;
-                    sendIRMessage.sendMessage(message); //stuur start signaal
-                    if (buttonChannel.read() == 4) {
-                        parameters.setParams(0x00, playtime);
+            for (;;) {
+                case IDLE: {
+                    auto evt = wait(startFlag);
+                    if(evt == startFlag){
+                        status = SYSTEMSTARTUP;
                         break;
                     }
                 }
+                case SYSTEMSTARTUP: {
+                    scherm.preGame();
+                    auto evt = wait(buttonChannel);
+                    if (evt == buttonChannel) {
+                        if (buttonChannel.read() != 0) {
+                            status = KIESTIMING;
+                            break;
+                        }
+                    }
+                }
+
+                case KIESTIMING: {
+                    auto evt = wait(buttonChannel);
+                    if(evt == buttonChannel){
+                        int button = buttonChannel.read();
+                        scherm.setTiming(playtime);
+                        if (button == 1) {
+                            playtime++;
+                            scherm.setTiming(playtime);
+                        }else if (button == 2) {
+                            playtime--;
+                            scherm.setTiming(playtime);
+                        }
+                        if (button == 4) {
+                            status = SENDSTARTSIGNAL;
+                            break;
+                        }
+                    }
+                }
+
+                case SENDSTARTSIGNAL: {
+                    for (;;) {
+                        auto evt = wait(buttonChannel);
+                        if(evt == buttonChannel){
+                            playerID++;
+                            message = (((((1 << 4) | playerID) << 2 | weaponPower) << 5) | playtime) << 4;
+                            sendIRMessage.sendMessage(message); //stuur start signaal
+                            if (buttonChannel.read() == 4) {
+                                parameters.setParams(0x00, playtime);
+                                status = IDLE;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -76,12 +98,17 @@ public:
     initGameControl(sendIRMessageControl & sendIRMessage, display & scherm):
         rtos::task<>("initGameControlTaak"),
         buttonChannel(this, "buttonID"),
+        startFlag(this, "startFlag"),
         sendIRMessage(sendIRMessage),
         scherm(scherm)
     {}
 
     void buttonPressed(int buttonID){
-        buttonPressedChannel.write(buttonID);
+        buttonChannel.write(buttonID);
+    }
+
+    void start(){
+        startFlag.set();
     }
 
 
