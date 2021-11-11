@@ -16,11 +16,19 @@ private:
     uint8_t weaponpower = 0;
 
     void main(){
+<<<<<<< HEAD
+=======
+        hwlib::cout << "KAK";
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
         for(;;){
 
             auto evt = wait(initMessageFlag+messageFlag);
 
             if(evt == initMessageFlag){
+<<<<<<< HEAD
+=======
+
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
                 sendMessage(message);
             }
             if(evt == messageFlag){
@@ -45,10 +53,15 @@ private:
     }
 
     void sendMessage(uint16_t Message){
+<<<<<<< HEAD
 
         for(unsigned int i = 0; i < 16; i++){
             bool bit = (Message & (32768 >> i));
 
+=======
+        for(unsigned int i = 0; i < 16; i++){
+            bool bit = (Message & (32768 >> i));
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
             if(bit){
                 sendOne();
             }else{
@@ -76,7 +89,11 @@ private:
 
 public:
     sendIRMessageControl():
+<<<<<<< HEAD
         rtos::task<>( 2, "sendIRMessage"),
+=======
+        rtos::task<>( 3, "sendIRMessage"),
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
         initMessageFlag(this, "initMessageFlag"),
         messageFlag(this, "messageFlag")
     {}

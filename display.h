@@ -115,7 +115,11 @@ private:
 
 public:
     display():
+<<<<<<< HEAD
         rtos::task<>(3, "schermTaak"),
+=======
+        rtos::task<>(1, "schermTaak"),
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
         preSpel(this, "preSpel"),
         setTime(this, "setTime"),
         setPower(this, "setPower"),

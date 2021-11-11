@@ -81,7 +81,9 @@ private:
 
                             playerID++;
                             message = (((((1 << 4) | playerID) << 2 | weaponPower) << 5) | playtime) << 4;
+                            hwlib::cout << "sprankje hoop 2";
                             sendIRMessage.setInitMessageFlag(message); //stuur start signaal
+                            hwlib::cout << "sprankje hoop the follow up";
                             if (buttonChannel.read() == 4) {
                                 hwlib::cout << "pls werk";
                                 playerID = 0;

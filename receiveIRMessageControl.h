@@ -16,8 +16,12 @@ private:
     gameParametersControl & parameters;
 
 public:
+<<<<<<< HEAD
     receiveIRMessageControl(gameParametersControl & parameters):
     rtos::task<>( "receiveIRMessageControlTaak"), parameters(parameters) {}
+=======
+    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>(6, "receiveIRMessageControlTaak"), parameters(parameters) {}
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
 
     void main(){
         enum state_t {IDLE, RECEIVE, STARTGAME};

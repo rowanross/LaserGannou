@@ -29,7 +29,11 @@ private:
 public:
 
     ButtonListener(initGameControl & initGame, runGameControl & runGame, gameParametersControl & gameParam):
+<<<<<<< HEAD
         rtos::task<>( 4, "buttonListenerTask"),
+=======
+        rtos::task<>(2, "buttonListenerTask"),
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
         initGame(initGame),
         runGame(runGame),
         gameParam(gameParam)

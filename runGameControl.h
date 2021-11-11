@@ -10,6 +10,14 @@
 #include "display.h"
 #include "struct.h"
 
+<<<<<<< HEAD
+=======
+//struct killedBy {
+//    unsigned int playerCode = 0;
+//    unsigned int amount = 0;
+//};
+
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
 class runGameControl : public rtos::task<>{
 private:
     enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
@@ -131,7 +139,11 @@ private:
 
 public:
     runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
+<<<<<<< HEAD
             rtos::task<>( "RunGameTask"),
+=======
+            rtos::task<>(9, "RunGameTask"),
+>>>>>>> 02d7de1592c584de8c407a9539bc5f8791becba6
             parametersPool("parametersPool"),
             hitFlag(this, "hitFlag"),
             parametersFlag(this, "parametersFlag"),
