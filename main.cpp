@@ -17,9 +17,8 @@ int main( void ){
     auto display = display();
     auto irSend = sendIRMessageControl();
     auto init = InitGameControl(irSend, display);
-    auto runGame = RunGameClass(bieper, irSend, display, transfer);
-    auto params = Registergame(runGame, display);
+    auto runGame = runGameControl(bieper, irSend, display, transfer);
+    auto params = gameParametersControl(runGame, display);
     auto receive = receiveIRMessageControl(params);
-
     rtos::run();
 }
