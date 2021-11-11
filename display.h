@@ -11,7 +11,19 @@
 
 class display : public rtos::task<>{
 private:
-        hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
+    rtos::flag preSpel;
+    rtos::flag setTime;
+    rtos::flag setPower;
+    rtos::flag flush;
+    rtos::flag confirm;
+    rtos::flag showTime;
+    rtos::flag clear;
+
+    int time;
+    int weaponpower;
+    int restTime;
+
+    hwlib::target::pin_oc scl = hwlib::target::pin_oc( hwlib::target::pins::scl );
     hwlib::target::pin_oc sda = hwlib::target::pin_oc( hwlib::target::pins::sda );
     hwlib::i2c_bus_bit_banged_scl_sda i2c_bus = hwlib::i2c_bus_bit_banged_scl_sda(scl, sda);
     hwlib::glcd_oled oled = hwlib::glcd_oled(i2c_bus, 0x3c);
@@ -43,36 +55,6 @@ private:
     hwlib::terminal_from d5 = hwlib::terminal_from( w5, f3 );
     hwlib::terminal_from d6 = hwlib::terminal_from( w6, f3 );
 
-    void main() {
-        //idk abstracte klasse. dit vind het nodig
-        const int PRE_GAME = 1;
-        const int SETTIMING = 2;
-        const int SETWEAPONPOWER = 2;
-        const int RUNGAME = 2;
-        int state = 0;
-        switch(state){
-            case PRE_GAME:
-                if(pre)
-                preGame();
-                break;
-            case SETTIMING:
-                int timing = 5;
-                setTiming(timing)
-                break;
-            case SETWEAPONPOWER:
-                int weaponPower = 1;
-                setWeaponPower(weaponPower);
-            case RUNGAME:
-                RunGame();
-        }
-    }
-
-public:
-
-    display():
-        rtos::task<>("schermTaak")
-    {}
-
     void preGame(){
         oled.clear();
         d1 << "\f"
@@ -102,13 +84,6 @@ public:
         oled.flush();
     }
 
-    void RunGame(){
-        oled.flush();
-        //timer komt nog uit runGameControl
-    }
-
-
-
     void showConfirm(){
         d4 << "druk aub op de";
         d5 << "confirm knop,";
@@ -137,6 +112,77 @@ public:
 
         showChange();
 
+    }
+
+    void main() {
+        auto evt = wait(preSpel+setTime+setPower+flush+confirm+showTime+clear);
+        for(;;){
+            if(evt == preSpel){
+                preGame();
+            }
+            if(evt == setTime){
+                setTiming(time);
+            }
+            if(evt == setPower){
+                setWeaponPower(weaponpower);
+            }
+            if(evt == flush){
+                showChange();
+            }
+            if(evt == confirm){
+                showConfirm();
+            }
+            if(evt == showTime){
+                ShowTiming(restTime);
+            }
+            if(evt == clear){
+                clearDisplay();
+            }
+        }
+    }
+
+public:
+
+    display():
+        rtos::task<>("schermTaak"),
+        preSpel(this, "preSpel"),
+        setTime(this, "setTime"),
+        setPower(this, "setPower"),
+        flush(this, "flush"),
+        confirm(this, "confirm"),
+        showTime(this, "showTime"),
+        clear(this, "clear")
+    {}
+
+    void setPreSpelFlag(){
+        preSpel.set();
+    }
+
+    void setTimeFlag(int & playtime){
+        time =  playtime;
+        setTime.set();
+    }
+
+    void setPowerFlag(int & power){
+        weaponpower = power;
+        setPower.set();
+    }
+
+    void setFlushFlag(){
+        flush.set();
+    }
+
+    void setConfirmFlag(){
+        confirm.set();
+    }
+
+    void setShowTimeFlag(int & timeLeft){
+        restTime = timeLeft;
+        showTime.set();
+    }
+
+    void setClearFlag(){
+        clear.set();
     }
 };
 

@@ -75,9 +75,9 @@ private:
 
                     if(evt == gameClock){
                         playtime--;
-                        scherm.ShowTiming(playtime);
+                        scherm.setShowTimeFlag(playtime);
                         if(playtime == 0){
-                            scherm.showConfirm();
+                            scherm.setConfirmFlag();
                             state = TRANSFER;
                             break;
                         }
@@ -120,7 +120,7 @@ private:
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 4){
                             transfer.transferData(kills);
-                            scherm.clearDisplay();
+                            scherm.setClearFlag();
                             state = IDLE;
                             break;
                         }

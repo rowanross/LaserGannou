@@ -44,7 +44,7 @@ private:
                     }
                 }
                 case SYSTEMSTARTUP: {
-                    scherm.preGame();
+                    scherm.setPreSpelFlag();
                     auto evt = wait(buttonChannel);
                     if (evt == buttonChannel) {
                         if (buttonChannel.read() != 0) {
@@ -58,13 +58,13 @@ private:
                     auto evt = wait(buttonChannel);
                     if(evt == buttonChannel){
                         int button = buttonChannel.read();
-                        scherm.setTiming(playtime);
+                        scherm.setTimeFlag(playtime);
                         if (button == 1) {
                             playtime++;
-                            scherm.setTiming(playtime);
+                            scherm.setTimeFlag(playtime);
                         }else if (button == 2) {
                             playtime--;
-                            scherm.setTiming(playtime);
+                            scherm.setTimeFlag(playtime);
                         }
                         if (button == 4) {
                             status = SENDSTARTSIGNAL;

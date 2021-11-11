@@ -34,22 +34,22 @@ private:
                 case WEAPONPOWER: {
                     auto evt = wait(buttonPressedChannel);
                     weaponPower = 1;
-                    scherm.setWeaponPower(weaponPower);
+                    scherm.setPowerFlag(weaponPower);
                     if(evt == buttonPressedChannel){
                         if(weaponPower> 1){
                             if(buttonPressedChannel.read() == 2){
                                 weaponPower--;
-                                scherm.setWeaponPower(weaponPower);
+                                scherm.setPowerFlag(weaponPower);
                             }
                         }
                         if(weaponPower < 3){
                             if(buttonPressedChannel.read() == 1){
                                 weaponPower++;
-                                scherm.setWeaponPower(weaponPower);
+                                scherm.setPowerFlag(weaponPower);
                             }
                         }
                         if(buttonPressedChannel.read() == 4){
-                            scherm.clearDisplay();
+                            scherm.setClearFlag();
                             state = STARTGAME;
                             break;
                         }
