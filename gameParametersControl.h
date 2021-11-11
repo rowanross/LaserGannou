@@ -11,7 +11,7 @@ private:
     enum state_t {IDLE, WEAPONPOWER, STARTGAME};
     state_t state = IDLE;
     rtos::flag startFlag;
-    rtos::channel<int, 5> buttonChannel;
+    rtos::channel<int, 5> buttonPressedChannel;
 
     uint16_t playtime = 0;
     uint16_t playerID = 0;
@@ -19,9 +19,6 @@ private:
 
     runGameControl & runGame;
     display & scherm;
-
-    rtos::channel<int, 5> buttonPressedChannel;
-    rtos::flag parametersFlag;
 
     void main(){
         for(;;){
@@ -34,23 +31,23 @@ private:
                     break;
                 }
                 case WEAPONPOWER: {
-                    auto evt = wait(buttonChannel);
+                    auto evt = wait(buttonPressedChannel);
                     weaponPower = 1;
                     scherm.setWeaponPower(weaponPower);
-                    if(evt == buttonChannel){
+                    if(evt == buttonPressedChannel){
                         if(weaponPower> 1){
-                            if(buttonChannel.read() == 2){
+                            if(buttonPressedChannel.read() == 2){
                                 weaponPower--;
                                 scherm.setWeaponPower(weaponPower);
                             }
                         }
                         if(weaponPower < 3){
-                            if(buttonChannel.read() == 1){
+                            if(buttonPressedChannel.read() == 1){
                                 weaponPower++;
                                 scherm.setWeaponPower(weaponPower);
                             }
                         }
-                        if(buttonChannel.read() == 4){
+                        if(buttonPressedChannel.read() == 4){
                             scherm.clearDisplay();
                             state = STARTGAME;
                             break;
@@ -70,10 +67,9 @@ public:
     gameParametersControl(runGameControl & runGame, display & scherm):
             rtos::task<>("parametersControlTask"),
             startFlag(this, "startFlag"),
-            buttonChannel(this, "buttonID"),
+            buttonPressedChannel(this, "buttonID"),
             runGame(runGame),
-            scherm(scherm)
-    {}
+            scherm(scherm){}
 
     void setParams(uint16_t & playerID_r, uint16_t & playtime_r){
         playerID = playerID_r;
