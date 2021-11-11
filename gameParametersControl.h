@@ -3,10 +3,9 @@
 
 #include "hwlib.hpp"
 #include "rtos.hpp"
-#include "runGameControl.h"
 #include "bieperControl.h"
 #include "display.h"
-
+#include "runGameControl.h"
 class gameParametersControl : public rtos::task <>{
 private:
     enum state_t {IDLE, WEAPONPOWER, STARTGAME};
@@ -25,7 +24,7 @@ private:
 
 public:
     gameParametersControl(runGameControl & runGame, display & scherm):
-            rtos::task<>("parametersControlTask"),
+            rtos::task<>(1, "parametersControlTask"),
             startFlag(this, "startFlag"),
             buttonPressedChannel(this, "buttonID"),
             runGame(runGame),
@@ -60,6 +59,7 @@ public:
                         }
                         if(buttonPressedChannel.read() == 4){
                             scherm.setClearFlag();
+                            hwlib::cout << "yoink";
                             state = STARTGAME;
                             break;
                         }

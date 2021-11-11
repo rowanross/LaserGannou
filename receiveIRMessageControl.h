@@ -9,29 +9,28 @@ class receiveIRMessageControl : public rtos::task <>{
 private:
     hwlib::target::pin_in pin = hwlib::target::pin_in(hwlib::target::pins::d52);
     uint16_t data = 0x00;
-    int timer;
-    uint8_t playerID;
-    uint8_t weaponPower;
-    uint8_t playtime;
-
+    int timer = 0;
+    uint8_t playerID = 0;
+    uint8_t weaponPower = 0;
+    uint8_t playtime = 0;
     gameParametersControl & parameters;
 
-
-
-
 public:
-    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
+    receiveIRMessageControl(gameParametersControl & parameters):
+    rtos::task<>( "receiveIRMessageControlTaak"), parameters(parameters) {}
 
     void main(){
         enum state_t {IDLE, RECEIVE, STARTGAME};
         state_t state = IDLE;
         for (;;) {
+
             switch (state) {
                 case IDLE: {
                     pin.refresh();
                     if (pin.read() == 0) {
                         state = RECEIVE;
                     }
+
                     break;
                 }
 

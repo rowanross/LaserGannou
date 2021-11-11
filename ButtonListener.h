@@ -20,7 +20,7 @@ private:
     hwlib::target::pin_in trigger  = hwlib::target::pin_in( hwlib::target::pins::d42 );
 
     initGameControl & initGame;
-    display & scherm;
+
     runGameControl & runGame;
     gameParametersControl & gameParam;
 
@@ -28,33 +28,54 @@ private:
 
 public:
 
-    ButtonListener(initGameControl & initGame, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame) , runGame(runGame){}
+    ButtonListener(initGameControl & initGame, runGameControl & runGame, gameParametersControl & gameParam):
+        rtos::task<>( 4, "buttonListenerTask"),
+        initGame(initGame),
+        runGame(runGame),
+        gameParam(gameParam)
+    {}
     void main() {
         for (;;) {
-            if (!plusKnop.read()) {
+            if (plusKnop.read() == 0) {
+
+                while (plusKnop.read() == 0){}
+                hwlib::cout << "1" ;
                 initGame.buttonPressed(1);
                 runGame.buttonPressed(1);
                 gameParam.buttonPressed(1);
+
             }
-            if (!minKnop.read()) {
+            if (minKnop.read()== 0) {
+                while (minKnop.read() == 0){}
+                hwlib::cout << "2" ;
                 initGame.buttonPressed(2);
                 runGame.buttonPressed(2);
                 gameParam.buttonPressed(2);
+
             }
-            if (!menuKnop.read()) {
+            if (menuKnop.read()== 0) {
+                while (menuKnop.read() == 0){}
+                hwlib::cout << "3" ;
                 initGame.buttonPressed(3);
                 runGame.buttonPressed(3);
                 gameParam.buttonPressed(3);
+
             }
-            if (!confirmKnop.read()) {
+            if (confirmKnop.read()== 0) {
+                while (confirmKnop.read() == 0){}
+                hwlib::cout << "4" ;
                 initGame.buttonPressed(4);
                 runGame.buttonPressed(4);
                 gameParam.buttonPressed(4);
+
             }
-            if (!trigger.read()) {
+            if (trigger.read()== 0) {
+                while (trigger.read() == 0){}
+                hwlib::cout << "5" ;
                 initGame.buttonPressed(5);
                 runGame.buttonPressed(5);
                 gameParam.buttonPressed(5);
+
             }
         }
     }

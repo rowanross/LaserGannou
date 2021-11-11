@@ -39,7 +39,7 @@ private:
 
 
 public:
-    bieperControl(): rtos::task<>("bieperControlTaak"),
+    bieperControl(): rtos::task<>( "bieperControlTaak"),
         playHit(this, "playHit"),
         playDeath(this, "playDeath")
         {}
