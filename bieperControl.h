@@ -36,6 +36,14 @@ private:
         rtttl_play( p, deathSound);
     }
 
+
+
+public:
+    bieperControl(): rtos::task<>("bieperControlTaak"),
+        playHit(this, "playHit"),
+        playDeath(this, "playDeath")
+        {}
+
     void main(){
         for(;;){
             auto evt = wait(playHit+playDeath);
@@ -49,12 +57,6 @@ private:
             }
         }
     }
-
-public:
-    bieperControl(): rtos::task<>("bieperControlTaak"),
-        playHit(this, "playHit"),
-        playDeath(this, "playDeath")
-        {}
 
     void setPlayHitFlag(){
         playHit.set();

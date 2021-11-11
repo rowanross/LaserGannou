@@ -8,7 +8,14 @@ class sendIRMessageControl : public rtos::task<> {
 private:
     hwlib::target::d2_36kHz led_1 = hwlib::target::d2_36kHz();
 
-    void main(){}
+    rtos::flag initMessageFlag;
+    rtos::flag messageFlag;
+
+    uint16_t message;
+    uint8_t playerID;
+    uint8_t weaponpower;
+
+
 
     void sendZero(){
         led_1.write(1);
@@ -23,9 +30,6 @@ private:
         led_1.write(0);
         hwlib::wait_us(800);
     }
-
-public:
-    sendIRMessageControl() : rtos::task<>("sendIRMessage"){}
 
     void sendMessage(uint16_t message){
         for(unsigned int i = 0; i < 16; i++){
@@ -49,6 +53,41 @@ public:
             }
         }
     }
+
+
+
+
+
+public:
+    sendIRMessageControl():
+        rtos::task<>("sendIRMessage"),
+        initMessageFlag(this, "initMessageFlag"),
+        messageFlag(this, "messageFlag")
+    {}
+
+    void main(){
+        auto evt = wait(initMessageFlag+messageFlag);
+        for(;;){
+            if(evt == initMessageFlag){
+                sendMessage(message);
+            }
+            if(evt == messageFlag){
+                sendMessage(playerID, weaponpower);
+            }
+        }
+    }
+
+    void setInitMessageFlag(uint16_t bericht){
+        message = bericht;
+        initMessageFlag.set();
+    }
+
+    void setMessageFlag(uint8_t ID, uint8_t power){
+        playerID = ID;
+        weaponpower = power;
+        messageFlag.set();
+    }
+
 
 };
 

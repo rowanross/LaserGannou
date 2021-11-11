@@ -6,18 +6,39 @@
 
 class transferHit : public rtos::task<>{
 private:
-    void main(){}
-public:
-    transferHit();
+    rtos::flag transfer;
+
+    killedBy deaths[9];
+
     void transferData(const killedBy kills[9]){
         hwlib::wait_ms(200);
         for(unsigned int i = 0; i < 9; i++){
             hwlib::cout << kills[i].playerCode << ","<< kills[i].amount << "\n";
         }
-//        for (const killedBy & x : kills){
-//            hwlib::cout << x.playerCode << ","<< x.amount << "\n";
-//        }
     }
+
+
+public:
+    transferHit():
+        transfer(this, "transfer")
+    {}
+
+    void main(){
+        auto evt = wait(transfer);
+        for(;;){
+            if(evt == transfer){
+                transferData(deaths);
+            }
+        }
+    }
+
+    void setTransferFlag(const killedBy kills[9]){
+        for(unsigned int i = 0; i < 9; i++){
+            deaths[i] = kills[i];
+        }
+        transfer.set();
+    }
+
 };
 
 

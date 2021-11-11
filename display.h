@@ -114,6 +114,21 @@ private:
 
     }
 
+
+
+public:
+
+    display():
+        rtos::task<>("schermTaak"),
+        preSpel(this, "preSpel"),
+        setTime(this, "setTime"),
+        setPower(this, "setPower"),
+        flush(this, "flush"),
+        confirm(this, "confirm"),
+        showTime(this, "showTime"),
+        clear(this, "clear")
+    {}
+
     void main() {
         auto evt = wait(preSpel+setTime+setPower+flush+confirm+showTime+clear);
         for(;;){
@@ -140,19 +155,6 @@ private:
             }
         }
     }
-
-public:
-
-    display():
-        rtos::task<>("schermTaak"),
-        preSpel(this, "preSpel"),
-        setTime(this, "setTime"),
-        setPower(this, "setPower"),
-        flush(this, "flush"),
-        confirm(this, "confirm"),
-        showTime(this, "showTime"),
-        clear(this, "clear")
-    {}
 
     void setPreSpelFlag(){
         preSpel.set();

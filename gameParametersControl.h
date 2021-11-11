@@ -21,6 +21,16 @@ private:
     runGameControl & runGame;
     display & scherm;
 
+
+
+public:
+    gameParametersControl(runGameControl & runGame, display & scherm):
+            rtos::task<>("parametersControlTask"),
+            startFlag(this, "startFlag"),
+            buttonPressedChannel(this, "buttonID"),
+            runGame(runGame),
+            scherm(scherm){}
+
     void main(){
         for(;;){
             switch(state) {
@@ -63,14 +73,6 @@ private:
             }
         }
     }
-
-public:
-    gameParametersControl(runGameControl & runGame, display & scherm):
-            rtos::task<>("parametersControlTask"),
-            startFlag(this, "startFlag"),
-            buttonPressedChannel(this, "buttonID"),
-            runGame(runGame),
-            scherm(scherm){}
 
     void setParams(uint16_t & playerID_r, int & playtime_r){
         playerID = playerID_r;

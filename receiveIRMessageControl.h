@@ -17,6 +17,11 @@ private:
     gameParametersControl & parameters;
 
 
+
+
+public:
+    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
+
     void main(){
         enum state_t {IDLE, RECEIVE, STARTGAME};
         state_t state = IDLE;
@@ -71,10 +76,6 @@ private:
             }
         }
     }
-
-public:
-    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
-
 
 //    bool checkSum(uint16_t message) {
 //        for (unsigned int i = 1; i < 6; i++) {

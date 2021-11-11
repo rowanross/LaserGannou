@@ -24,6 +24,11 @@ private:
     runGameControl & runGame;
     gameParametersControl & gameParam;
 
+
+
+public:
+
+    ButtonListener(initGameControl & initGame, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame) , runGame(runGame){}
     void main() {
         for (;;) {
             if (!plusKnop.read()) {
@@ -53,11 +58,6 @@ private:
             }
         }
     }
-
-public:
-
-    ButtonListener(initGameControl & initGame, runGameControl & runGame): rtos::task<>("buttonListenerTask"), initGame(initGame) , runGame(runGame){}
-
 };
 
 

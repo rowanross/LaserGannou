@@ -40,6 +40,25 @@ private:
     int weaponPower;
     unsigned long int countdown = 10;
 
+
+
+public:
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
+            rtos::task<>("RunGameTask"),
+            parametersPool("parametersPool"),
+            hitFlag(this, "hitFlag"),
+            parametersFlag(this, "parametersFlag"),
+            countdownTimer(this, "countdownTimer"),
+            revivalTimer(this, "revivalTimer"),
+            reloadTimer(this, "reloadTimer"),
+            gameClock(this, 1, "gameClock"),
+            buttonChannel(this, "buttonID"),
+            bieper(bieper),
+            IR(IR),
+            scherm(scherm),
+            transfer(transfer)
+    {}
+
     void main(){
         for(;;){
             switch(state){
@@ -84,7 +103,7 @@ private:
                     }
                 }
                 case SHOOT: {
-                    IR.sendMessage(playerID, weaponPower);
+                    IR.setMessageFlag(playerID, weaponPower);
                     state = RELOAD;
                     break;
                 }
@@ -95,7 +114,7 @@ private:
                     break;
                 }
                 case HIT: {
-                    bieper.playHitSound();
+                    bieper.setPlayHitFlag();
                     health = health - (parametersPool.read() * 17);
                     if(health <= 0){
                         state = DEAD;
@@ -109,7 +128,7 @@ private:
                     int ID = parametersPool.read();
                     kills[ID-1].playerCode = ID;
                     kills[ID-1].amount++;
-                    bieper.playDeathSound();
+                    bieper.setPlayDeathFlag();
                     wait(revivalTimer);
                     health = 100;
                     state = NORMAAL;
@@ -119,7 +138,7 @@ private:
                     auto evt = wait(buttonChannel);
                     if(evt == buttonChannel){
                         if(buttonChannel.read() == 4){
-                            transfer.transferData(kills);
+                            transfer.setTransferFlag(kills);
                             scherm.setClearFlag();
                             state = IDLE;
                             break;
@@ -129,23 +148,6 @@ private:
             }
         }
     }
-
-public:
-    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
-            rtos::task<>("RunGameTask"),
-            parametersPool("parametersPool"),
-            hitFlag(this, "hitFlag"),
-            parametersFlag(this, "parametersFlag"),
-            countdownTimer(this, "countdownTimer"),
-            revivalTimer(this, "revivalTimer"),
-            reloadTimer(this, "reloadTimer"),
-            gameClock(this, 1, "gameClock"),
-            buttonChannel(this, "buttonID"),
-            bieper(bieper),
-            IR(IR),
-            scherm(scherm),
-            transfer(transfer)
-    {}
 
     void setParameters(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
