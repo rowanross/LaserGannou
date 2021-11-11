@@ -14,11 +14,11 @@ int main( void ){
     hwlib::wait_ms(500);
     auto bieper = bieperControl();
     auto transfer = transferHit();
-    auto display = display();
+    auto scherm = display();
     auto irSend = sendIRMessageControl();
-    auto init = InitGameControl(irSend, display);
-    auto runGame = runGameControl(bieper, irSend, display, transfer);
-    auto params = gameParametersControl(runGame, display);
+    auto runGame = runGameControl(bieper, irSend, scherm, transfer);
+    auto params = gameParametersControl(runGame, scherm);
+    auto init = initGameControl(irSend, scherm, params);
     auto receive = receiveIRMessageControl(params);
     rtos::run();
 }

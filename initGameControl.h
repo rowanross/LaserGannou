@@ -96,10 +96,11 @@ private:
 
 
 public:
-    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm):
+    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm, gameParametersControl & parameters):
         rtos::task<>("initGameControlTaak"),
-        buttonChannel(this, "buttonID"),
+        parameters(parameters),
         startFlag(this, "startFlag"),
+        buttonChannel(this, "buttonID"),
         sendIRMessage(sendIRMessage),
         scherm(scherm)
     {}

@@ -5,6 +5,8 @@
 #include "struct.h"
 
 class transferHit : public rtos::task<>{
+private:
+    void main(){}
 public:
     transferHit();
     void transferData(const killedBy kills[9]){
