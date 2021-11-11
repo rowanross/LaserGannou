@@ -23,11 +23,8 @@ private:
     hwlib::target::pin_out lsp = hwlib::target::pin_out( hwlib::target::pins::d7 );
     note_player_gpio p = note_player_gpio( lsp );
 
-    void main(){
-        //idk moest dit maken volgens CLION aangezien klasse abstract is.
-    }
-public:
-    bieperControl(): rtos::task<>("bieperControlTaak"){}
+    rtos::flag playHit;
+    rtos::flag playDeath;
 
     void playHitSound(){
         //aan te roepen vanuit bijv. rungGameControl bij iedere hit;
@@ -37,6 +34,34 @@ public:
     void playDeathSound(){
         //aan te roepen vanuit bijv. runGameContol bij iedere keer dat je dood gaat.
         rtttl_play( p, deathSound);
+    }
+
+    void main(){
+        for(;;){
+            auto evt = wait(playHit+playDeath);
+            if(evt == playHit){
+                playHitSound();
+                break;
+            }
+            if(evt == playDeath){
+                playDeathSound();
+                break;
+            }
+        }
+    }
+
+public:
+    bieperControl(): rtos::task<>("bieperControlTaak"),
+        playHit(this, "playHit"),
+        playDeath(this, "playDeath")
+        {}
+
+    void setPlayHitFlag(){
+        playHit.set();
+    }
+
+    void setPlayDeathFlag(){
+        playDeath.set();
     }
 };
 
