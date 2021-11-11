@@ -72,7 +72,7 @@ public:
             runGame(runGame),
             scherm(scherm){}
 
-    void setParams(uint16_t & playerID_r, int & playtime_r){
+    void setParams(uint16_t & playerID_r, uint16_t & playtime_r){
         playerID = playerID_r;
         playtime = playtime_r;
     }

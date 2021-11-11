@@ -19,7 +19,7 @@ private:
     static constexpr int IDLE = 4;
 
     uint16_t message = 0;
-    int playtime = 5;
+    uint16_t playtime = 5;
     uint16_t playerID = 0;
     uint16_t weaponPower = 0;
     gameParametersControl & parameters;
@@ -81,8 +81,7 @@ private:
                             message = (((((1 << 4) | playerID) << 2 | weaponPower) << 5) | playtime) << 4;
                             sendIRMessage.sendMessage(message); //stuur start signaal
                             if (buttonChannel.read() == 4) {
-                                playerID = 0;
-                                parameters.setParams(playerID, playtime);
+                                parameters.setParams(0x00, playtime);
                                 status = IDLE;
                                 break;
                             }
