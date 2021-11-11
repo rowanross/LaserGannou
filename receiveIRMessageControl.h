@@ -20,18 +20,20 @@ private:
 
 
 public:
-    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>("receiveIRMessageControlTaak"), parameters(parameters) {}
+    receiveIRMessageControl(gameParametersControl & parameters): rtos::task<>(6, "receiveIRMessageControlTaak"), parameters(parameters) {}
 
     void main(){
         enum state_t {IDLE, RECEIVE, STARTGAME};
         state_t state = IDLE;
         for (;;) {
+
             switch (state) {
                 case IDLE: {
                     pin.refresh();
                     if (pin.read() == 0) {
                         state = RECEIVE;
                     }
+
                     break;
                 }
 

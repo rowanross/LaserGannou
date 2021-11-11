@@ -11,6 +11,7 @@
 
 class display : public rtos::task<>{
 private:
+
     rtos::flag preSpel;
     rtos::flag setTime;
     rtos::flag setPower;
@@ -19,7 +20,7 @@ private:
     rtos::flag showTime;
     rtos::flag clear;
 
-    int time;
+    int time = 5;
     int weaponpower;
     int restTime;
 
@@ -119,7 +120,7 @@ private:
 public:
 
     display():
-        rtos::task<>("schermTaak"),
+        rtos::task<>(1, "schermTaak"),
         preSpel(this, "preSpel"),
         setTime(this, "setTime"),
         setPower(this, "setPower"),
@@ -130,10 +131,13 @@ public:
     {}
 
     void main() {
-        auto evt = wait(preSpel+setTime+setPower+flush+confirm+showTime+clear);
+
         for(;;){
+
+            auto evt = wait(preSpel+setTime+setPower+flush+confirm+showTime+clear);
             if(evt == preSpel){
                 preGame();
+
             }
             if(evt == setTime){
                 setTiming(time);

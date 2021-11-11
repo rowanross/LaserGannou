@@ -9,7 +9,16 @@ private:
     rtos::flag transfer;
 
     killedBy deaths[9];
+    void main(){
 
+        for(;;){
+            auto evt = wait(transfer);
+            if(evt == transfer){
+                transferData(deaths);
+
+            }
+        }
+    }
     void transferData(const killedBy kills[9]){
         hwlib::wait_ms(200);
         for(unsigned int i = 0; i < 9; i++){
@@ -23,14 +32,7 @@ public:
         transfer(this, "transfer")
     {}
 
-    void main(){
-        auto evt = wait(transfer);
-        for(;;){
-            if(evt == transfer){
-                transferData(deaths);
-            }
-        }
-    }
+
 
     void setTransferFlag(const killedBy kills[9]){
         for(unsigned int i = 0; i < 9; i++){

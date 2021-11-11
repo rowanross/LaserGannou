@@ -15,7 +15,22 @@ private:
     uint8_t playerID;
     uint8_t weaponpower;
 
+    void main(){
+        hwlib::cout << "KAK";
+        for(;;){
 
+            auto evt = wait(initMessageFlag+messageFlag);
+
+            if(evt == initMessageFlag){
+
+                sendMessage(message);
+            }
+            if(evt == messageFlag){
+                hwlib::cout << "KAK";
+                sendMessage(playerID, weaponpower);
+            }
+        }
+    }
 
     void sendZero(){
         led_1.write(1);
@@ -31,9 +46,9 @@ private:
         hwlib::wait_us(800);
     }
 
-    void sendMessage(uint16_t message){
+    void sendMessage(uint16_t Message){
         for(unsigned int i = 0; i < 16; i++){
-            bool bit = (message & (32768 >> i));
+            bool bit = (Message & (32768 >> i));
             if(bit){
                 sendOne();
             }else{
@@ -42,10 +57,10 @@ private:
         }
     }
 
-    void sendMessage(uint8_t playerID, uint8_t weaponpower){
-        uint16_t message = (((1 << 4) | playerID) << 2 | weaponpower) << 9;
+    void sendMessage(uint8_t PlayerID, uint8_t Weaponpower){
+        uint16_t Message = (((1 << 4) | PlayerID) << 2 | Weaponpower) << 9;
         for(unsigned int i = 0; i < 16; i++){
-            bool bit = (message & (32768 >> i));
+            bool bit = (Message & (32768 >> i));
             if(bit){
                 sendOne();
             }else{
@@ -60,22 +75,12 @@ private:
 
 public:
     sendIRMessageControl():
-        rtos::task<>("sendIRMessage"),
+        rtos::task<>( 3, "sendIRMessage"),
         initMessageFlag(this, "initMessageFlag"),
         messageFlag(this, "messageFlag")
     {}
 
-    void main(){
-        auto evt = wait(initMessageFlag+messageFlag);
-        for(;;){
-            if(evt == initMessageFlag){
-                sendMessage(message);
-            }
-            if(evt == messageFlag){
-                sendMessage(playerID, weaponpower);
-            }
-        }
-    }
+
 
     void setInitMessageFlag(uint16_t bericht){
         message = bericht;

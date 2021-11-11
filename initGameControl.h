@@ -27,27 +27,13 @@ private:
     sendIRMessageControl & sendIRMessage;
     display & scherm;
 
-
-
-
-
-
-public:
-    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm, gameParametersControl & parameters):
-        rtos::task<>("initGameControlTaak"),
-        parameters(parameters),
-        startFlag(this, "startFlag"),
-        buttonChannel(this, "buttonID"),
-        sendIRMessage(sendIRMessage),
-        scherm(scherm)
-    {}
-
     void main(){
         start();
+        for (;;) {
+            switch (state) {
 
-        switch (state) {
-            for (;;) {
                 case IDLE: {
+
                     auto evt = wait(startFlag);
                     if(evt == startFlag){
                         state = SYSTEMSTARTUP;
@@ -68,30 +54,38 @@ public:
                 case KIESTIMING: {
                     auto evt = wait(buttonChannel);
                     if(evt == buttonChannel){
-                        int button = buttonChannel.read();
-                        scherm.setTimeFlag(playtime);
-                        if (button == 1) {
-                            playtime++;
+                        for (;;){
+                            int button = buttonChannel.read();
                             scherm.setTimeFlag(playtime);
-                        }else if (button == 2) {
-                            playtime--;
-                            scherm.setTimeFlag(playtime);
+                            if (button == 1) {
+                                playtime++;
+                                scherm.setTimeFlag(playtime);
+                            }else if (button == 2) {
+                                playtime--;
+                                scherm.setTimeFlag(playtime);
+                            }
+                            if (button == 4) {
+                                state = SENDSTARTSIGNAL;
+                                break;
+                            }
                         }
-                        if (button == 4) {
-                            state = SENDSTARTSIGNAL;
-                            break;
-                        }
+
                     }
                 }
 
                 case SENDSTARTSIGNAL: {
                     for (;;) {
                         auto evt = wait(buttonChannel);
+
                         if(evt == buttonChannel){
+
                             playerID++;
                             message = (((((1 << 4) | playerID) << 2 | weaponPower) << 5) | playtime) << 4;
+                            hwlib::cout << "sprankje hoop 2";
                             sendIRMessage.setInitMessageFlag(message); //stuur start signaal
+                            hwlib::cout << "sprankje hoop the follow up";
                             if (buttonChannel.read() == 4) {
+                                hwlib::cout << "pls werk";
                                 playerID = 0;
                                 parameters.setParams(playerID, playtime);
                                 state = IDLE;
@@ -103,6 +97,21 @@ public:
             }
         }
     }
+
+
+
+
+public:
+    initGameControl(sendIRMessageControl & sendIRMessage, display & scherm, gameParametersControl & parameters):
+        rtos::task<>(0, "initGameControlTaak"),
+        parameters(parameters),
+        startFlag(this, "startFlag"),
+        buttonChannel(this, "buttonID"),
+        sendIRMessage(sendIRMessage),
+        scherm(scherm)
+    {}
+
+
 
     void buttonPressed(int buttonID){
         buttonChannel.write(buttonID);

@@ -25,7 +25,7 @@ private:
 
 public:
     gameParametersControl(runGameControl & runGame, display & scherm):
-            rtos::task<>("parametersControlTask"),
+            rtos::task<>(10, "parametersControlTask"),
             startFlag(this, "startFlag"),
             buttonPressedChannel(this, "buttonID"),
             runGame(runGame),

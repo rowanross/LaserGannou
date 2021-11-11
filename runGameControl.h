@@ -15,7 +15,7 @@
 //    unsigned int amount = 0;
 //};
 
-class runGameControl : public rtos::task <>{
+class runGameControl : public rtos::task<>{
 private:
     enum state_t {IDLE, COUNTDOWN, NORMAAL, SHOOT, RELOAD, HIT, DEAD, TRANSFER};
     state_t state = IDLE;
@@ -39,34 +39,16 @@ private:
     int health = 100;
     int weaponPower;
     unsigned long int countdown = 10;
-
-
-
-public:
-    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
-            rtos::task<>("RunGameTask"),
-            parametersPool("parametersPool"),
-            hitFlag(this, "hitFlag"),
-            parametersFlag(this, "parametersFlag"),
-            countdownTimer(this, "countdownTimer"),
-            revivalTimer(this, "revivalTimer"),
-            reloadTimer(this, "reloadTimer"),
-            gameClock(this, 1, "gameClock"),
-            buttonChannel(this, "buttonID"),
-            bieper(bieper),
-            IR(IR),
-            scherm(scherm),
-            transfer(transfer)
-    {}
-
     void main(){
         for(;;){
+
             switch(state){
                 case IDLE: {
                     auto evt = wait(parametersFlag);
                     if(evt == parametersFlag){
                         state = COUNTDOWN;
                     }
+
                     break;
                 }
                 case COUNTDOWN: {
@@ -76,9 +58,11 @@ public:
                     countdownTimer.set(countdown);
                     wait(countdownTimer);
                     state = NORMAAL;
+
                     break;
                 }
                 case NORMAAL: {
+
                     auto evt = wait(hitFlag+buttonChannel+gameClock);
                     if(evt == hitFlag){
                         state = HIT;
@@ -148,6 +132,26 @@ public:
             }
         }
     }
+
+
+public:
+    runGameControl(bieperControl & bieper, sendIRMessageControl & IR, display & scherm, transferHit & transfer):
+            rtos::task<>(9, "RunGameTask"),
+            parametersPool("parametersPool"),
+            hitFlag(this, "hitFlag"),
+            parametersFlag(this, "parametersFlag"),
+            countdownTimer(this, "countdownTimer"),
+            revivalTimer(this, "revivalTimer"),
+            reloadTimer(this, "reloadTimer"),
+            gameClock(this, 1, "gameClock"),
+            buttonChannel(this, "buttonID"),
+            bieper(bieper),
+            IR(IR),
+            scherm(scherm),
+            transfer(transfer)
+    {}
+
+
 
     void setParameters(int playerID, int weaponPower, int playtime){
         parametersPool.write(playerID);
