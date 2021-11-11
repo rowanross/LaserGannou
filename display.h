@@ -43,9 +43,28 @@ private:
     hwlib::terminal_from d5 = hwlib::terminal_from( w5, f3 );
     hwlib::terminal_from d6 = hwlib::terminal_from( w6, f3 );
 
-
     void main() {
         //idk abstracte klasse. dit vind het nodig
+        const int PRE_GAME = 1;
+        const int SETTIMING = 2;
+        const int SETWEAPONPOWER = 2;
+        const int RUNGAME = 2;
+        int state = 0;
+        switch(state){
+            case PRE_GAME:
+                if(pre)
+                preGame();
+                break;
+            case SETTIMING:
+                int timing = 5;
+                setTiming(timing)
+                break;
+            case SETWEAPONPOWER:
+                int weaponPower = 1;
+                setWeaponPower(weaponPower);
+            case RUNGAME:
+                RunGame();
+        }
     }
 
 public:
