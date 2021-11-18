@@ -12,7 +12,7 @@
 SOURCES :=
 
 # header files in this project
-HEADERS := runGameControl.h initGameControl.h gameParametersControl.h
+HEADERS :=
 
 # other places to look for files for this project
 SEARCH  := 
